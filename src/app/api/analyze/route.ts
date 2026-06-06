@@ -119,28 +119,31 @@ Analyze the session now and return the JSON object conforming to the rules.`;
 
         const model = genAI.getGenerativeModel({
           model: modelName,
+          systemInstruction: systemInstructions,
           generationConfig: {
             temperature: 0.3,
-            maxOutputTokens: 800,
+            maxOutputTokens: 4000,
             responseMimeType: 'application/json',
           },
         });
 
-        const result = await model.generateContent([
-          { text: systemInstructions },
-          { text: prompt },
-        ]);
+        const result = await model.generateContent(prompt);
 
         const responseText = result.response.text().trim();
-        console.log(`[NX Analyzer] Received response snippet:`, responseText.slice(0, 150));
-
+        
         let jsonStr = responseText;
         if (jsonStr.startsWith('```')) {
           const match = jsonStr.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/);
           if (match) jsonStr = match[1];
         }
 
-        const analysis = JSON.parse(jsonStr.trim());
+        let analysis;
+        try {
+          analysis = JSON.parse(jsonStr.trim());
+        } catch (err) {
+          console.error('[NX Analyzer] JSON Parse Error. Raw response was:', responseText);
+          throw err;
+        }
 
         if (!analysis.ratings || typeof analysis.ratings.avoidance !== 'number') {
           throw new Error('Invalid analysis structure from model');

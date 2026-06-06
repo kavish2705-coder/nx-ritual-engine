@@ -39,6 +39,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'userId required' }, { status: 400 });
     }
 
+    const { userId: _, ...updateFields } = body;
+
     await connectToDatabase();
 
     // Atomic upsert prevents concurrent double-creation race conditions
@@ -58,11 +60,11 @@ export async function POST(req: NextRequest) {
           knownFacts: []
         },
         $set: {
-          ...body,
+          ...updateFields,
           lastActive: Date.now()
         }
       },
-      { upsert: true, new: true, runValidators: true }
+      { upsert: true, returnDocument: 'after', runValidators: true }
     );
 
     return NextResponse.json({ success: true, data: user });

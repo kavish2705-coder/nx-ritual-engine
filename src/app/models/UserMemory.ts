@@ -3,7 +3,7 @@ import mongoose, { Schema } from 'mongoose';
 const MessageSchema = new Schema({
   role: { type: String, enum: ['user', 'nx'], required: true },
   content: { type: String, required: true },
-  timestamp: { type: Number, required: true }
+  timestamp: { type: Number, default: Date.now }
 });
 
 const SessionSchema = new Schema({
