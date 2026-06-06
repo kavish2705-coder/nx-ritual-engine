@@ -314,7 +314,7 @@ export default function Home() {
               {memory && (
                 <button
                   onClick={() => {
-                    if (confirm("Are you sure you want to purge all telemetry? This action is irreversible.")) {
+                    if (confirm("Are you sure you want to terminate this profile? All telemetry logs will be permanently deleted.")) {
                       fetch(`/api/memory?userId=${encodeURIComponent(memory.userId)}`, {
                         method: 'DELETE'
                       })
@@ -344,7 +344,7 @@ export default function Home() {
                   onMouseEnter={e => e.currentTarget.style.color = 'rgba(239, 68, 68, 0.8)'}
                   onMouseLeave={e => e.currentTarget.style.color = 'rgba(239, 68, 68, 0.45)'}
                 >
-                  · Purge system
+                  · Terminate profile
                 </button>
               )}
             </motion.div>
