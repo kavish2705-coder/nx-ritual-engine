@@ -38,7 +38,7 @@ const Particle = ({ delay, state }: { delay: number; state: CandleState }) => {
         delay: delay,
         ease: 'easeOut'
       }}
-      className="absolute w-1 h-1 bg-[#4FC3FF] rounded-full blur-[1px]"
+      className={`absolute w-1 h-1 rounded-full blur-[1px] transition-colors duration-1000 ${state === 'unstable' ? 'bg-[#ff1e1e]' : 'bg-[#4FC3FF]'}`}
       style={{ left: 'calc(50% - 2px)', bottom: '20px' }}
     />
   );
@@ -69,7 +69,7 @@ export default function AnimeCandle({ state: externalState, onClick, className =
     idle: { boxShadow: 'inset 0px 10px 20px rgba(0,0,0,0.8)' },
     ignition: { boxShadow: '0px 0px 15px rgba(79, 195, 255, 0.3), inset 0px 10px 20px rgba(0,0,0,0.8)', transition: { duration: 0.2 } },
     active: { boxShadow: '0px 0px 10px rgba(79, 195, 255, 0.15), inset 0px 10px 20px rgba(0,0,0,0.8)', transition: { duration: 2, repeat: Infinity, repeatType: 'reverse' as const } },
-    unstable: { boxShadow: '0px 0px 15px rgba(79, 195, 255, 0.2), inset 0px 10px 20px rgba(0,0,0,0.8)', transition: { duration: 1, repeat: Infinity, repeatType: 'reverse' as const } },
+    unstable: { boxShadow: '0px 0px 15px rgba(255, 30, 30, 0.35), inset 0px 10px 20px rgba(0,0,0,0.8)', transition: { duration: 1, repeat: Infinity, repeatType: 'reverse' as const } },
     extinguished: { boxShadow: 'inset 0px 10px 20px rgba(0,0,0,0.8)', transition: { duration: 1 } }
   };
 
@@ -124,8 +124,11 @@ export default function AnimeCandle({ state: externalState, onClick, className =
             variants={auraVariants}
             initial="idle"
             animate={state}
-            className="absolute bottom-0 w-32 h-40 bg-[#4FC3FF] rounded-full blur-[40px] pointer-events-none"
-            style={{ originY: 1 }}
+            className="absolute bottom-0 w-32 h-40 rounded-full blur-[40px] pointer-events-none transition-colors duration-1000"
+            style={{ 
+              originY: 1,
+              backgroundColor: state === 'unstable' ? '#ff1e1e' : '#4FC3FF'
+            }}
           />
 
           {/* PARTICLES */}
@@ -144,9 +147,11 @@ export default function AnimeCandle({ state: externalState, onClick, className =
             variants={midGlowVariants}
             initial="idle"
             animate={state}
-            className="absolute bottom-0 w-10 h-28 blur-[6px]"
+            className="absolute bottom-0 w-10 h-28 blur-[6px] transition-all duration-1000"
             style={{ 
-              background: 'linear-gradient(to top, rgba(0, 240, 255, 0), rgba(0, 240, 255, 0.8) 40%, rgba(79, 195, 255, 1))',
+              background: state === 'unstable'
+                ? 'linear-gradient(to top, rgba(255, 30, 30, 0), rgba(255, 30, 30, 0.8) 40%, rgba(139, 0, 0, 1))'
+                : 'linear-gradient(to top, rgba(0, 240, 255, 0), rgba(0, 240, 255, 0.8) 40%, rgba(79, 195, 255, 1))',
               borderRadius: '50% 50% 20% 20% / 60% 60% 40% 40%',
               originY: 1
             }}
@@ -157,9 +162,11 @@ export default function AnimeCandle({ state: externalState, onClick, className =
             variants={coreVariants}
             initial="idle"
             animate={state}
-            className="absolute bottom-0 w-4 h-20 blur-[1px]"
+            className="absolute bottom-0 w-4 h-20 blur-[1px] transition-all duration-1000"
             style={{ 
-              background: 'linear-gradient(to top, #ffffff, #e0f7fa 20%, #4FC3FF 60%, rgba(79, 195, 255, 0))',
+              background: state === 'unstable'
+                ? 'linear-gradient(to top, #ffffff, #ffebee 20%, #ff1e1e 60%, rgba(255, 30, 30, 0))'
+                : 'linear-gradient(to top, #ffffff, #e0f7fa 20%, #4FC3FF 60%, rgba(79, 195, 255, 0))',
               borderRadius: '50% 50% 20% 20% / 60% 60% 40% 40%',
               originY: 1
             }}
@@ -190,12 +197,23 @@ export default function AnimeCandle({ state: externalState, onClick, className =
             <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
             
             {/* The "Wick" area - stylized glow emitter */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-1 bg-[#4FC3FF]/40 blur-[1px] rounded-full shadow-[0_0_10px_#4FC3FF]" />
+            <div 
+              className={`absolute top-0 left-1/2 -translate-x-1/2 w-4 h-1 blur-[1px] rounded-full transition-all duration-1000 ${
+                state === 'unstable' 
+                  ? 'bg-[#ff1e1e]/40 shadow-[0_0_10px_#ff1e1e]' 
+                  : 'bg-[#4FC3FF]/40 shadow-[0_0_10px_#4FC3FF]'
+              }`} 
+            />
             
             {/* Internal gradient core visible on base */}
             <motion.div 
               animate={{ opacity: state !== 'idle' && state !== 'extinguished' ? 0.3 : 0.05 }}
-              className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-10 bg-gradient-to-b from-[#4FC3FF] to-transparent blur-[6px]" 
+              className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-10 blur-[6px] transition-all duration-1000"
+              style={{
+                background: state === 'unstable'
+                  ? 'linear-gradient(to bottom, #ff1e1e, transparent)'
+                  : 'linear-gradient(to bottom, #4FC3FF, transparent)'
+              }}
             />
           </motion.div>
         )}
@@ -208,8 +226,11 @@ export default function AnimeCandle({ state: externalState, onClick, className =
               scale: state === 'unstable' ? 1.2 : 1 
             }}
             transition={{ duration: 1 }}
-            className="absolute -bottom-6 w-32 h-6 bg-[#4FC3FF] rounded-[100%] blur-[12px] opacity-30 z-0 pointer-events-none"
-            style={{ transform: 'rotateX(70deg)' }}
+            className="absolute -bottom-6 w-32 h-6 rounded-[100%] blur-[12px] opacity-30 z-0 pointer-events-none transition-colors duration-1000"
+            style={{ 
+              transform: 'rotateX(70deg)',
+              backgroundColor: state === 'unstable' ? '#ff1e1e' : '#4FC3FF'
+            }}
           />
         )}
       </div>

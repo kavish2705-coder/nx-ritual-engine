@@ -364,17 +364,20 @@ export default function RitualView({ memory, onEnd }: Props) {
       const triggerFinalAnimationAndEnd = (mem: NXMemory) => {
         const isFinalSession = mem.sessionCount === 8;
         if (isFinalSession) {
-          setFinalEndingPhase('extinguishing');
-          setCandleState('extinguished');
+          setCandleState('unstable');
+          setTimeout(() => {
+            setFinalEndingPhase('extinguishing');
+            setCandleState('extinguished');
+          }, 2500);
           setTimeout(() => {
             setFinalEndingPhase('smoke');
-          }, 1500);
+          }, 4000);
           setTimeout(() => {
             setFinalEndingPhase('over');
-          }, 3800);
+          }, 6300);
           setTimeout(() => {
             onEnd(mem);
-          }, 8300);
+          }, 10800);
         } else {
           onEnd(mem);
         }
@@ -403,17 +406,20 @@ export default function RitualView({ memory, onEnd }: Props) {
       const triggerFinalAnimationAndEnd = (mem: NXMemory) => {
         const isFinalSession = mem.sessionCount === 8;
         if (isFinalSession) {
-          setFinalEndingPhase('extinguishing');
-          setCandleState('extinguished');
+          setCandleState('unstable');
+          setTimeout(() => {
+            setFinalEndingPhase('extinguishing');
+            setCandleState('extinguished');
+          }, 2500);
           setTimeout(() => {
             setFinalEndingPhase('smoke');
-          }, 1500);
+          }, 4000);
           setTimeout(() => {
             setFinalEndingPhase('over');
-          }, 3800);
+          }, 6300);
           setTimeout(() => {
             onEnd(mem);
-          }, 8300);
+          }, 10800);
         } else {
           onEnd(mem);
         }
@@ -912,22 +918,59 @@ export default function RitualView({ memory, onEnd }: Props) {
               zIndex: 100,
             }}
           >
-            <motion.h1
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: [0, 0.85, 0.85, 0], y: [15, 0, 0, -10] }}
-              transition={{ duration: 4.5, times: [0, 0.2, 0.8, 1] }}
-              style={{
-                fontFamily: 'Space Grotesk, sans-serif',
-                fontSize: 'clamp(22px, 5vw, 38px)',
-                fontWeight: 200,
-                letterSpacing: '0.22em',
-                color: 'var(--nx-text)',
-                textAlign: 'center',
-                textTransform: 'lowercase',
-              }}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [1, 1, 0] }}
+              transition={{ duration: 4.0, times: [0, 0.8, 1] }}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 20px' }}
             >
-              the ritual is over.
-            </motion.h1>
+              <h1
+                style={{
+                  fontFamily: 'Space Grotesk, sans-serif',
+                  fontSize: 'clamp(26px, 7vw, 48px)',
+                  fontWeight: 800,
+                  letterSpacing: '0.25em',
+                  color: '#ff2a2a',
+                  textShadow: '0 0 15px rgba(255, 30, 30, 0.8), 0 0 30px rgba(255, 30, 30, 0.4)',
+                  textAlign: 'center',
+                  textTransform: 'uppercase',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  flexWrap: 'wrap',
+                }}
+              >
+                {Array.from("THE RITUAL IS OVER.").map((char, i) => (
+                  <motion.span
+                    key={i}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{
+                      delay: i * 0.08,
+                      duration: 0.05,
+                    }}
+                    style={{ display: 'inline-block', whiteSpace: char === ' ' ? 'pre' : 'normal' }}
+                  >
+                    {char}
+                  </motion.span>
+                ))}
+              </h1>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.5 }}
+                transition={{ delay: 2.0, duration: 0.8 }}
+                style={{
+                  fontFamily: 'Space Mono, monospace',
+                  fontSize: '11px',
+                  letterSpacing: '0.35em',
+                  color: '#64748b',
+                  marginTop: '24px',
+                  textTransform: 'uppercase',
+                  textAlign: 'center',
+                }}
+              >
+                calibration completed.
+              </motion.p>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

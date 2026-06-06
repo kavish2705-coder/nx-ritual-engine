@@ -3,12 +3,15 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Models to try in order of preference
 const MODELS = [
+  ...(process.env.GEMINI_MODEL ? [process.env.GEMINI_MODEL] : []),
   'gemini-2.5-pro',
   'gemini-pro-latest',
   'gemini-2.5-flash',
   'gemini-2.0-flash',
   'gemini-flash-latest',
   'gemini-3.5-flash',
+  'gemini-3.1-flash-lite',
+  'gemini-2.5-flash-lite',
 ];
 
 export async function POST(req: NextRequest) {
@@ -84,7 +87,7 @@ export async function POST(req: NextRequest) {
           model: modelName,
           systemInstruction: systemPrompt,
           generationConfig: {
-            temperature: 0.85,
+            temperature: 0.45,
             maxOutputTokens: 4000,
             topP: 0.9,
           },

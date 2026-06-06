@@ -43,26 +43,37 @@ export async function POST(req: NextRequest) {
 
     await connectToDatabase();
 
+    const defaultFields = {
+      sessions: [],
+      traits: { avoidance: 0, overthinking: 0, inconsistency: 0, stressResponse: 0 },
+      totalEntries: 0,
+      flameState: 'stable',
+      sessionCount: 0,
+      patterns: [],
+      behavioralPatterns: [],
+      discrepancyLog: [],
+      knownFacts: []
+    };
+
+    const setOnInsertObj: any = { userId };
+    const setObj: any = {
+      ...updateFields,
+      lastActive: Date.now()
+    };
+
+    // Prevent key overlap between $setOnInsert and $set
+    for (const [key, val] of Object.entries(defaultFields)) {
+      if (!(key in setObj)) {
+        setOnInsertObj[key] = val;
+      }
+    }
+
     // Atomic upsert prevents concurrent double-creation race conditions
     const user = await UserMemory.findOneAndUpdate(
       { userId: { $regex: new RegExp(`^${userId}$`, 'i') } },
       {
-        $setOnInsert: {
-          userId,
-          sessions: [],
-          traits: { avoidance: 0, overthinking: 0, inconsistency: 0, stressResponse: 0 },
-          totalEntries: 0,
-          flameState: 'stable',
-          sessionCount: 0,
-          patterns: [],
-          behavioralPatterns: [],
-          discrepancyLog: [],
-          knownFacts: []
-        },
-        $set: {
-          ...updateFields,
-          lastActive: Date.now()
-        }
+        $setOnInsert: setOnInsertObj,
+        $set: setObj
       },
       { upsert: true, returnDocument: 'after', runValidators: true }
     );
