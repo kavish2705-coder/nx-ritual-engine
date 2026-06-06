@@ -26,8 +26,20 @@ export default function Home() {
   ];
 
   useEffect(() => {
-    const mem = loadMemory();
-    setMemory(mem);
+    const userId = typeof window !== 'undefined' ? localStorage.getItem('nx_userId') : null;
+    if (userId) {
+      fetch(`/api/memory?userId=${encodeURIComponent(userId)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.exists) {
+            setMemory(data.data);
+          } else {
+            // Cleans up stale user IDs if deleted from server
+            localStorage.removeItem('nx_userId');
+          }
+        })
+        .catch(err => console.error('Failed to load user memory', err));
+    }
 
     const timer = setTimeout(() => setShowSkip(true), 3000);
     const taglineTimer = setInterval(() => {
@@ -62,8 +74,25 @@ export default function Home() {
   };
 
   const handleOnboardingComplete = useCallback((newMemory: NXMemory) => {
-    setMemory(newMemory);
-    setView('ritual');
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('nx_userId', newMemory.userId);
+    }
+    // Save new memory to database
+    fetch('/api/memory', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newMemory)
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setMemory(data.data);
+          setView('ritual');
+        } else {
+          console.error('Failed to initialize profile in DB', data.error);
+        }
+      })
+      .catch(err => console.error('Failed to initialize profile in DB', err));
   }, []);
 
   const handleRitualEnd = useCallback((updatedMemory: NXMemory) => {
@@ -286,8 +315,22 @@ export default function Home() {
                 <button
                   onClick={() => {
                     if (confirm("Are you sure you want to purge all telemetry? This action is irreversible.")) {
-                      localStorage.removeItem('nx_memory');
-                      window.location.reload();
+                      fetch(`/api/memory?userId=${encodeURIComponent(memory.userId)}`, {
+                        method: 'DELETE'
+                      })
+                        .then(() => {
+                          localStorage.removeItem('nx_userId');
+                          localStorage.removeItem('nx_api_key');
+                          localStorage.removeItem('nx_memory');
+                          window.location.reload();
+                        })
+                        .catch(err => {
+                          console.error('Failed to purge server memory', err);
+                          localStorage.removeItem('nx_userId');
+                          localStorage.removeItem('nx_api_key');
+                          localStorage.removeItem('nx_memory');
+                          window.location.reload();
+                        });
                     }
                   }}
                   style={{

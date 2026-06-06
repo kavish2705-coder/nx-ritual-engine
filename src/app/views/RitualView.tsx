@@ -350,10 +350,8 @@ export default function RitualView({ memory, onEnd }: Props) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: messages,
-          currentTraits: memory.traits,
-          sessionCount: memory.sessionCount,
-          discrepancyLog: memory.discrepancyLog || [],
+          userId: memory.userId,
+          session: finalSession,
           apiKey,
         }),
       });
@@ -361,66 +359,7 @@ export default function RitualView({ memory, onEnd }: Props) {
       const data = await res.json();
       if (data.error) throw new Error(data.error);
 
-      // Merge new patterns
-      const existingPatterns = memory.behavioralPatterns || [];
-      const newPatterns = data.newPatterns || [];
-      const updatedPatterns = [...existingPatterns];
-
-      newPatterns.forEach((patName: string) => {
-        const idx = updatedPatterns.findIndex(p => p.name.toLowerCase() === patName.toLowerCase());
-        if (idx >= 0) {
-          updatedPatterns[idx] = {
-            ...updatedPatterns[idx],
-            status: 'active',
-            lastUpdated: Date.now(),
-          };
-        } else {
-          updatedPatterns.push({
-            name: patName,
-            status: 'active',
-            lastUpdated: Date.now(),
-          });
-        }
-      });
-
-      // Merge discrepancies
-      const existingDiscrepancies = memory.discrepancyLog || [];
-      const newDiscrepancies = data.newDiscrepancies || [];
-      const updatedDiscrepancies = [...existingDiscrepancies];
-
-      newDiscrepancies.forEach((newD: any) => {
-        const idx = updatedDiscrepancies.findIndex(
-          d => d.claim.toLowerCase() === newD.claim.toLowerCase() && d.observed.toLowerCase() === newD.observed.toLowerCase()
-        );
-        if (idx >= 0) {
-          updatedDiscrepancies[idx].occurrences += 1;
-        } else {
-          updatedDiscrepancies.push({
-            claim: newD.claim,
-            observed: newD.observed,
-            occurrences: 1,
-          });
-        }
-      });
-
-      // Merge known facts
-      const existingFacts = memory.knownFacts || [];
-      const updatedFacts = data.knownFacts && data.knownFacts.length > 0
-        ? Array.from(new Set([...existingFacts, ...data.knownFacts]))
-        : existingFacts;
-
-      const updatedMemory: NXMemory = {
-        ...memory,
-        sessions: [...memory.sessions, { ...finalSession, endedAt: Date.now(), summary: data.summary }],
-        totalEntries: memory.totalEntries + messages.filter(m => m.role === 'user').length,
-        lastActive: Date.now(),
-        sessionCount: memory.sessionCount + 1,
-        flameState: candleState,
-        traits: data.traits,
-        behavioralPatterns: updatedPatterns,
-        discrepancyLog: updatedDiscrepancies,
-        knownFacts: updatedFacts,
-      };
+      const updatedMemory = data.data;
 
       const triggerFinalAnimationAndEnd = (mem: NXMemory) => {
         const isFinalSession = mem.sessionCount === 8;
@@ -441,7 +380,6 @@ export default function RitualView({ memory, onEnd }: Props) {
         }
       };
 
-      saveMemory(updatedMemory);
       triggerFinalAnimationAndEnd(updatedMemory);
 
     } catch (err) {
@@ -455,6 +393,13 @@ export default function RitualView({ memory, onEnd }: Props) {
         flameState: candleState,
       };
 
+      // Try to save baseline to server if possible
+      fetch('/api/memory', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedMemory)
+      }).catch(e => console.error('Failed to save baseline memory on server', e));
+
       const triggerFinalAnimationAndEnd = (mem: NXMemory) => {
         const isFinalSession = mem.sessionCount === 8;
         if (isFinalSession) {
@@ -474,7 +419,6 @@ export default function RitualView({ memory, onEnd }: Props) {
         }
       };
 
-      saveMemory(updatedMemory);
       triggerFinalAnimationAndEnd(updatedMemory);
     } finally {
       setAnalyzing(false);

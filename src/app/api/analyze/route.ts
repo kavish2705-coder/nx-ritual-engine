@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { connectToDatabase } from '../../lib/mongodb';
+import UserMemory from '../../models/UserMemory';
 
 const MODELS = [
   'gemini-1.5-flash-latest',
@@ -10,17 +12,40 @@ const MODELS = [
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages, currentTraits, sessionCount, discrepancyLog, apiKey: clientKey } = await req.json();
+    const { userId, session, apiKey: clientKey } = await req.json();
+
+    if (!userId) {
+      return NextResponse.json({ error: 'userId required' }, { status: 400 });
+    }
+
+    if (!session || !session.messages || session.messages.length === 0) {
+      return NextResponse.json({ error: 'Valid session telemetry required' }, { status: 400 });
+    }
 
     const apiKey = process.env.GEMINI_API_KEY || clientKey;
     if (!apiKey) {
       return NextResponse.json({ error: 'API key required' }, { status: 401 });
     }
 
+    await connectToDatabase();
+
+    // Fetch user memory
+    const user = await UserMemory.findOne({
+      userId: { $regex: new RegExp(`^${userId}$`, 'i') }
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: 'User memory profile not found' }, { status: 404 });
+    }
+
+    const currentTraits = user.traits || { avoidance: 0, overthinking: 0, inconsistency: 0, stressResponse: 0 };
+    const sessionCount = user.sessionCount || 0;
+    const discrepancyLog = user.discrepancyLog || [];
+
     const genAI = new GoogleGenerativeAI(apiKey);
 
     // Format the conversation log for the prompt
-    const chatTranscript = messages
+    const chatTranscript = session.messages
       .map((m: any) => `${m.role === 'user' ? 'USER' : 'SYSTEM (NX)'}: ${m.content}`)
       .join('\n');
 
@@ -79,7 +104,7 @@ Example JSON output structure:
 ${sessionCount}
 
 [EXISTING DISCREPANCIES IN MEMORY]
-${JSON.stringify(discrepancyLog || [])}
+${JSON.stringify(discrepancyLog)}
 
 [SESSION TRANSCRIPT]
 ${chatTranscript}
@@ -94,9 +119,9 @@ Analyze the session now and return the JSON object conforming to the rules.`;
         const model = genAI.getGenerativeModel({
           model: modelName,
           generationConfig: {
-            temperature: 0.3, // low temperature for structured logic
+            temperature: 0.3,
             maxOutputTokens: 800,
-            responseMimeType: 'application/json', // request JSON if supported
+            responseMimeType: 'application/json',
           },
         });
 
@@ -106,9 +131,8 @@ Analyze the session now and return the JSON object conforming to the rules.`;
         ]);
 
         const responseText = result.response.text().trim();
-        console.log(`[NX Analyzer] Received response:`, responseText.slice(0, 150));
+        console.log(`[NX Analyzer] Received response snippet:`, responseText.slice(0, 150));
 
-        // Clean up markdown block styling if the model ignored responseMimeType
         let jsonStr = responseText;
         if (jsonStr.startsWith('```')) {
           const match = jsonStr.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/);
@@ -117,7 +141,6 @@ Analyze the session now and return the JSON object conforming to the rules.`;
 
         const analysis = JSON.parse(jsonStr.trim());
 
-        // Validate structure
         if (!analysis.ratings || typeof analysis.ratings.avoidance !== 'number') {
           throw new Error('Invalid analysis structure from model');
         }
@@ -132,21 +155,70 @@ Analyze the session now and return the JSON object conforming to the rules.`;
 
         // Merge patterns
         const newPatterns = analysis.patterns || [];
+        const updatedPatterns = [...(user.behavioralPatterns || [])];
+        newPatterns.forEach((patName: string) => {
+          const idx = updatedPatterns.findIndex((p: any) => p.name.toLowerCase() === patName.toLowerCase());
+          if (idx >= 0) {
+            updatedPatterns[idx].status = 'active';
+            updatedPatterns[idx].lastUpdated = Date.now();
+          } else {
+            updatedPatterns.push({
+              name: patName,
+              status: 'active',
+              lastUpdated: Date.now(),
+            });
+          }
+        });
 
         // Merge discrepancies
         const newDiscrepancies = analysis.discrepancies || [];
+        const updatedDiscrepancies = [...(user.discrepancyLog || [])];
+        newDiscrepancies.forEach((newD: any) => {
+          const idx = updatedDiscrepancies.findIndex(
+            (d: any) => d.claim.toLowerCase() === newD.claim.toLowerCase() && d.observed.toLowerCase() === newD.observed.toLowerCase()
+          );
+          if (idx >= 0) {
+            updatedDiscrepancies[idx].occurrences += 1;
+          } else {
+            updatedDiscrepancies.push({
+              claim: newD.claim,
+              observed: newD.observed,
+              occurrences: 1,
+            });
+          }
+        });
 
         // Merge known facts
-        const knownFacts = analysis.knownFacts || [];
+        const existingFacts = user.knownFacts || [];
+        const newFacts = analysis.knownFacts || [];
+        const updatedFacts = newFacts.length > 0
+          ? Array.from(new Set([...existingFacts, ...newFacts]))
+          : existingFacts;
 
-        return NextResponse.json({
+        // Build session object to save
+        const finalSession = {
+          id: session.id,
+          startedAt: session.startedAt,
+          endedAt: Date.now(),
+          messages: session.messages,
+          patterns: newPatterns,
           summary: analysis.summary || 'Session complete.',
-          traits: updatedTraits,
-          sessionRatings: analysis.ratings, // individual session ratings for comparison
-          newPatterns,
-          newDiscrepancies,
-          knownFacts,
-        });
+        };
+
+        // Update database user
+        user.traits = updatedTraits;
+        user.behavioralPatterns = updatedPatterns;
+        user.discrepancyLog = updatedDiscrepancies;
+        user.knownFacts = updatedFacts;
+        user.sessions.push(finalSession);
+        user.totalEntries += session.messages.filter((m: any) => m.role === 'user').length;
+        user.sessionCount += 1;
+        user.lastActive = Date.now();
+        user.flameState = user.sessionCount >= 8 ? 'extinguished' : 'stable';
+
+        await user.save();
+
+        return NextResponse.json({ success: true, data: user });
 
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : String(err);

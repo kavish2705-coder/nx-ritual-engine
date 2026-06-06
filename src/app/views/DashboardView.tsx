@@ -182,8 +182,22 @@ export default React.memo(function DashboardView({ memory, onBeginRitual, onDisc
         <button
           onClick={() => {
             if (confirm("Are you sure you want to purge all telemetry? This action is irreversible.")) {
-              localStorage.removeItem('nx_memory');
-              window.location.reload();
+              fetch(`/api/memory?userId=${encodeURIComponent(memory.userId)}`, {
+                method: 'DELETE'
+              })
+                .then(() => {
+                  localStorage.removeItem('nx_userId');
+                  localStorage.removeItem('nx_api_key');
+                  localStorage.removeItem('nx_memory');
+                  window.location.reload();
+                })
+                .catch(err => {
+                  console.error('Failed to purge server memory', err);
+                  localStorage.removeItem('nx_userId');
+                  localStorage.removeItem('nx_api_key');
+                  localStorage.removeItem('nx_memory');
+                  window.location.reload();
+                });
             }
           }}
           style={{
