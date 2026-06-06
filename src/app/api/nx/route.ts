@@ -3,10 +3,11 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Models to try in order of preference
 const MODELS = [
+  'gemini-2.5-pro',
+  'gemini-pro-latest',
   'gemini-2.5-flash',
   'gemini-2.0-flash',
   'gemini-flash-latest',
-  'gemini-pro-latest',
   'gemini-3.5-flash',
 ];
 
