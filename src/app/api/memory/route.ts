@@ -41,32 +41,29 @@ export async function POST(req: NextRequest) {
 
     await connectToDatabase();
 
-    // Check if user already exists
-    let user = await UserMemory.findOne({
-      userId: { $regex: new RegExp(`^${userId}$`, 'i') }
-    });
-
-    if (user) {
-      // Update existing memory
-      Object.assign(user, body);
-      user.lastActive = Date.now();
-      await user.save();
-    } else {
-      // Create new user memory
-      user = await UserMemory.create({
-        userId,
-        sessions: [],
-        traits: { avoidance: 0, overthinking: 0, inconsistency: 0, stressResponse: 0 },
-        totalEntries: 0,
-        lastActive: Date.now(),
-        flameState: 'stable',
-        sessionCount: 0,
-        patterns: [],
-        behavioralPatterns: [],
-        discrepancyLog: [],
-        knownFacts: []
-      });
-    }
+    // Atomic upsert prevents concurrent double-creation race conditions
+    const user = await UserMemory.findOneAndUpdate(
+      { userId: { $regex: new RegExp(`^${userId}$`, 'i') } },
+      {
+        $setOnInsert: {
+          userId,
+          sessions: [],
+          traits: { avoidance: 0, overthinking: 0, inconsistency: 0, stressResponse: 0 },
+          totalEntries: 0,
+          flameState: 'stable',
+          sessionCount: 0,
+          patterns: [],
+          behavioralPatterns: [],
+          discrepancyLog: [],
+          knownFacts: []
+        },
+        $set: {
+          ...body,
+          lastActive: Date.now()
+        }
+      },
+      { upsert: true, new: true, runValidators: true }
+    );
 
     return NextResponse.json({ success: true, data: user });
   } catch (err: unknown) {
