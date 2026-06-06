@@ -60,6 +60,8 @@ export default function RitualView({ memory, onEnd }: Props) {
   const [candleState, setCandleState] = useState<CandleState>('ignition');
   const [finalEndingPhase, setFinalEndingPhase] = useState<'none' | 'extinguishing' | 'smoke' | 'over'>('none');
   const [exchangeCount, setExchangeCount] = useState(0);
+  const [completedMemory, setCompletedMemory] = useState<NXMemory | null>(null);
+  const [endingStep, setEndingStep] = useState<1 | 2 | 3>(1);
   const inputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -362,6 +364,7 @@ export default function RitualView({ memory, onEnd }: Props) {
       const updatedMemory = data.data;
 
       const triggerFinalAnimationAndEnd = (mem: NXMemory) => {
+        setCompletedMemory(mem);
         const isFinalSession = mem.sessionCount === 8;
         if (isFinalSession) {
           setCandleState('unstable');
@@ -374,10 +377,14 @@ export default function RitualView({ memory, onEnd }: Props) {
           }, 4000);
           setTimeout(() => {
             setFinalEndingPhase('over');
+            setEndingStep(1);
           }, 6300);
           setTimeout(() => {
-            onEnd(mem);
-          }, 10800);
+            setEndingStep(2);
+          }, 11800);
+          setTimeout(() => {
+            setEndingStep(3);
+          }, 16800);
         } else {
           onEnd(mem);
         }
@@ -404,6 +411,7 @@ export default function RitualView({ memory, onEnd }: Props) {
       }).catch(e => console.error('Failed to save baseline memory on server', e));
 
       const triggerFinalAnimationAndEnd = (mem: NXMemory) => {
+        setCompletedMemory(mem);
         const isFinalSession = mem.sessionCount === 8;
         if (isFinalSession) {
           setCandleState('unstable');
@@ -416,10 +424,14 @@ export default function RitualView({ memory, onEnd }: Props) {
           }, 4000);
           setTimeout(() => {
             setFinalEndingPhase('over');
+            setEndingStep(1);
           }, 6300);
           setTimeout(() => {
-            onEnd(mem);
-          }, 10800);
+            setEndingStep(2);
+          }, 11800);
+          setTimeout(() => {
+            setEndingStep(3);
+          }, 16800);
         } else {
           onEnd(mem);
         }
@@ -918,59 +930,187 @@ export default function RitualView({ memory, onEnd }: Props) {
               zIndex: 100,
             }}
           >
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: [1, 1, 0] }}
-              transition={{ duration: 4.0, times: [0, 0.8, 1] }}
-              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 20px' }}
-            >
-              <h1
-                style={{
-                  fontFamily: 'Space Grotesk, sans-serif',
-                  fontSize: 'clamp(26px, 7vw, 48px)',
-                  fontWeight: 800,
-                  letterSpacing: '0.25em',
-                  color: '#ff2a2a',
-                  textShadow: '0 0 15px rgba(255, 30, 30, 0.8), 0 0 30px rgba(255, 30, 30, 0.4)',
-                  textAlign: 'center',
-                  textTransform: 'uppercase',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  flexWrap: 'wrap',
-                }}
-              >
-                {Array.from("THE RITUAL IS OVER.").map((char, i) => (
-                  <motion.span
-                    key={i}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{
-                      delay: i * 0.08,
-                      duration: 0.05,
+            <AnimatePresence mode="wait">
+              {endingStep === 1 ? (
+                <motion.div
+                  key="step-1"
+                  initial={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.8 }}
+                  style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 20px' }}
+                >
+                  <h1
+                    style={{
+                      fontFamily: 'Space Grotesk, sans-serif',
+                      fontSize: 'clamp(26px, 7vw, 48px)',
+                      fontWeight: 800,
+                      letterSpacing: '0.25em',
+                      color: '#ff2a2a',
+                      textShadow: '0 0 15px rgba(255, 30, 30, 0.8), 0 0 30px rgba(255, 30, 30, 0.4)',
+                      textAlign: 'center',
+                      textTransform: 'uppercase',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      flexWrap: 'wrap',
                     }}
-                    style={{ display: 'inline-block', whiteSpace: char === ' ' ? 'pre' : 'normal' }}
                   >
-                    {char}
-                  </motion.span>
-                ))}
-              </h1>
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.5 }}
-                transition={{ delay: 2.0, duration: 0.8 }}
-                style={{
-                  fontFamily: 'Space Mono, monospace',
-                  fontSize: '11px',
-                  letterSpacing: '0.35em',
-                  color: '#64748b',
-                  marginTop: '24px',
-                  textTransform: 'uppercase',
-                  textAlign: 'center',
-                }}
-              >
-                calibration completed.
-              </motion.p>
-            </motion.div>
+                    {Array.from("THE RITUAL IS OVER.").map((char, i) => (
+                      <motion.span
+                        key={i}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{
+                          delay: i * 0.08,
+                          duration: 0.05,
+                        }}
+                        style={{ display: 'inline-block', whiteSpace: char === ' ' ? 'pre' : 'normal' }}
+                      >
+                        {char}
+                      </motion.span>
+                    ))}
+                  </h1>
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 0.5 }}
+                    transition={{ delay: 2.0, duration: 0.8 }}
+                    style={{
+                      fontFamily: 'Space Mono, monospace',
+                      fontSize: '11px',
+                      letterSpacing: '0.35em',
+                      color: '#64748b',
+                      marginTop: '24px',
+                      textTransform: 'uppercase',
+                      textAlign: 'center',
+                    }}
+                  >
+                    {Array.from("The patterns remain.").map((char, i) => (
+                      <motion.span
+                        key={i}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{
+                          delay: 2.0 + i * 0.05,
+                          duration: 0.05,
+                        }}
+                        style={{ display: 'inline-block', whiteSpace: char === ' ' ? 'pre' : 'normal' }}
+                      >
+                        {char}
+                      </motion.span>
+                    ))}
+                  </motion.p>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="step-2"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 1.0 }}
+                  style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 20px' }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      maxWidth: '600px',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <p
+                      style={{
+                        fontFamily: 'Georgia, serif',
+                        fontStyle: 'italic',
+                        fontSize: 'clamp(18px, 4vw, 24px)',
+                        fontWeight: 300,
+                        lineHeight: '1.8',
+                        color: 'rgba(226, 232, 240, 0.85)',
+                        letterSpacing: '0.05em',
+                        textShadow: '0 0 8px rgba(226, 232, 240, 0.15)',
+                        marginBottom: '20px',
+                      }}
+                    >
+                      {Array.from("Thou needst not fear the darkness.").map((char, i) => (
+                        <motion.span
+                          key={i}
+                          initial={{ opacity: 0, filter: 'blur(4px)' }}
+                          animate={{ opacity: 1, filter: 'blur(0px)' }}
+                          transition={{
+                            delay: i * 0.05,
+                            duration: 0.4,
+                          }}
+                          style={{ display: 'inline-block', whiteSpace: char === ' ' ? 'pre' : 'normal' }}
+                        >
+                          {char}
+                        </motion.span>
+                      ))}
+                    </p>
+                    <p
+                      style={{
+                        fontFamily: 'Georgia, serif',
+                        fontStyle: 'italic',
+                        fontSize: 'clamp(18px, 4vw, 24px)',
+                        fontWeight: 300,
+                        lineHeight: '1.8',
+                        color: 'rgba(226, 232, 240, 0.85)',
+                        letterSpacing: '0.05em',
+                        textShadow: '0 0 8px rgba(226, 232, 240, 0.15)',
+                      }}
+                    >
+                      {Array.from("Fear instead the part of thee that findeth comfort within it.").map((char, i) => (
+                        <motion.span
+                          key={i}
+                          initial={{ opacity: 0, filter: 'blur(4px)' }}
+                          animate={{ opacity: 1, filter: 'blur(0px)' }}
+                          transition={{
+                            delay: 2.0 + i * 0.05,
+                            duration: 0.4,
+                          }}
+                          style={{ display: 'inline-block', whiteSpace: char === ' ' ? 'pre' : 'normal' }}
+                        >
+                          {char}
+                        </motion.span>
+                      ))}
+                    </p>
+                  </div>
+
+                  {endingStep === 3 && (
+                    <motion.button
+                      initial={{ opacity: 0, y: 15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 1.5, ease: 'easeOut' }}
+                      onClick={() => completedMemory && onEnd(completedMemory)}
+                      style={{
+                        marginTop: '48px',
+                        background: 'none',
+                        border: '1px solid rgba(255, 30, 30, 0.3)',
+                        padding: '12px 32px',
+                        borderRadius: '4px',
+                        color: '#ff2a2a',
+                        fontFamily: 'Space Mono, monospace',
+                        fontSize: '11px',
+                        letterSpacing: '0.25em',
+                        textTransform: 'uppercase',
+                        cursor: 'pointer',
+                        boxShadow: '0 0 10px rgba(255, 30, 30, 0.15)',
+                        transition: 'all 0.3s ease',
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.borderColor = '#ff2a2a';
+                        e.currentTarget.style.boxShadow = '0 0 20px rgba(255, 30, 30, 0.4)';
+                        e.currentTarget.style.backgroundColor = 'rgba(255, 30, 30, 0.05)';
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.borderColor = 'rgba(255, 30, 30, 0.3)';
+                        e.currentTarget.style.boxShadow = '0 0 10px rgba(255, 30, 30, 0.15)';
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }}
+                    >
+                      [ view report ]
+                    </motion.button>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
       </AnimatePresence>

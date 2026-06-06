@@ -38,8 +38,13 @@ const Particle = ({ delay, state }: { delay: number; state: CandleState }) => {
         delay: delay,
         ease: 'easeOut'
       }}
-      className={`absolute w-1 h-1 rounded-full blur-[1px] transition-colors duration-1000 ${state === 'unstable' ? 'bg-[#ff1e1e]' : 'bg-[#4FC3FF]'}`}
-      style={{ left: 'calc(50% - 2px)', bottom: '20px' }}
+      className="absolute w-1 h-1 rounded-full blur-[1px]"
+      style={{ 
+        left: 'calc(50% - 2px)', 
+        bottom: '20px',
+        backgroundColor: state === 'unstable' ? '#ff1e1e' : '#4FC3FF',
+        transition: 'background-color 1s ease'
+      }}
     />
   );
 };
@@ -48,7 +53,6 @@ export default function AnimeCandle({ state: externalState, onClick, className =
   const [internalState, setInternalState] = useState<CandleState>('idle');
   const state = externalState || internalState;
 
-  // Handle internal state progression for demonstration
   const handleClick = () => {
     if (onClick) return onClick();
 
@@ -64,7 +68,6 @@ export default function AnimeCandle({ state: externalState, onClick, className =
 
   // --- Animation Variants ---
 
-  // The base of the candle
   const baseVariants: Variants = {
     idle: { boxShadow: 'inset 0px 10px 20px rgba(0,0,0,0.8)' },
     ignition: { boxShadow: '0px 0px 15px rgba(79, 195, 255, 0.3), inset 0px 10px 20px rgba(0,0,0,0.8)', transition: { duration: 0.2 } },
@@ -73,44 +76,126 @@ export default function AnimeCandle({ state: externalState, onClick, className =
     extinguished: { boxShadow: 'inset 0px 10px 20px rgba(0,0,0,0.8)', transition: { duration: 1 } }
   };
 
-  // The large, soft ambient aura behind the flame
   const auraVariants: Variants = {
-    idle: { opacity: 0, scale: 0.5 },
-    ignition: { opacity: 0.3, scale: 1.2, transition: { duration: 0.3, ease: 'easeOut' } },
-    active: { opacity: [0.15, 0.25, 0.15], scale: [1.0, 1.1, 1.0], transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' } },
-    unstable: { opacity: [0.2, 0.3, 0.2], scale: [1.05, 1.15, 1.05], transition: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' } },
-    extinguished: { opacity: 0, scale: 0.5, transition: { duration: 0.8, ease: 'easeIn' } }
+    idle: { opacity: 0, scale: 0.5, backgroundColor: '#4FC3FF' },
+    ignition: { opacity: 0.3, scale: 1.2, backgroundColor: '#4FC3FF', transition: { duration: 0.3, ease: 'easeOut' } },
+    active: { 
+      opacity: [0.15, 0.25, 0.15], 
+      scale: [1.0, 1.1, 1.0], 
+      backgroundColor: '#4FC3FF',
+      transition: { 
+        duration: 3, 
+        repeat: Infinity, 
+        ease: 'easeInOut'
+      } 
+    },
+    unstable: { 
+      opacity: [0.2, 0.3, 0.2], 
+      scale: [1.05, 1.15, 1.05], 
+      backgroundColor: '#ff1e1e',
+      transition: { 
+        backgroundColor: { duration: 1.0 },
+        duration: 1.5, 
+        repeat: Infinity, 
+        ease: 'easeInOut' 
+      } 
+    },
+    extinguished: { opacity: 0, scale: 0.5, backgroundColor: '#ff1e1e', transition: { duration: 0.8, ease: 'easeIn' } }
   };
 
-  // The mid-layer cyan glow
-  const midGlowVariants: Variants = {
+  const reflectionVariants: Variants = {
+    idle: { opacity: 0.2, scale: 1, backgroundColor: '#4FC3FF' },
+    ignition: { opacity: 0.2, scale: 1, backgroundColor: '#4FC3FF' },
+    active: { opacity: 0.5, scale: 1, backgroundColor: '#4FC3FF', transition: { duration: 1 } },
+    unstable: { opacity: 0.5, scale: 1.2, backgroundColor: '#ff1e1e', transition: { duration: 1 } },
+    extinguished: { opacity: 0.2, scale: 1, backgroundColor: '#ff1e1e', transition: { duration: 1 } }
+  };
+
+  const cyanMidGlowVariants: Variants = {
     idle: { opacity: 0, scaleY: 0, scaleX: 0 },
     ignition: { opacity: 1, scaleY: [0, 1.4, 1], scaleX: [0.1, 0.4, 1], transition: { duration: 0.4, ease: 'easeOut' } },
-    active: { opacity: [0.7, 0.9, 0.7], scaleY: [1, 1.05, 0.98, 1], scaleX: [1, 0.95, 1.02, 1], transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' } },
-    unstable: { opacity: [0.8, 1, 0.8], scaleY: [1, 1.08, 0.95, 1], scaleX: [1, 0.92, 1.05, 1], transition: { duration: 1, repeat: Infinity, ease: 'easeInOut' } },
-    extinguished: { opacity: 0, scaleY: 0, scaleX: 0, transition: { duration: 0.4, ease: 'easeIn' } }
+    active: { 
+      opacity: [0.7, 0.9, 0.7], 
+      scaleY: [1, 1.05, 0.98, 1], 
+      scaleX: [1, 0.95, 1.02, 1], 
+      transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' } 
+    },
+    unstable: { 
+      opacity: 0, 
+      scaleY: 0, 
+      scaleX: 0, 
+      transition: { duration: 1.0 } 
+    },
+    extinguished: { 
+      opacity: 0, 
+      scaleY: 0, 
+      scaleX: 0, 
+      transition: { duration: 0.4, ease: 'easeIn' } 
+    }
   };
 
-  // The very bright inner core (electric blue -> white)
-  const coreVariants: Variants = {
+  const redMidGlowVariants: Variants = {
+    idle: { opacity: 0, scaleY: 0, scaleX: 0 },
+    ignition: { opacity: 0, scaleY: 0, scaleX: 0 },
+    active: { opacity: 0, scaleY: 0, scaleX: 0 },
+    unstable: { 
+      opacity: [0.8, 1, 0.8], 
+      scaleY: [1, 1.08, 0.95, 1], 
+      scaleX: [1, 0.92, 1.05, 1], 
+      transition: { duration: 1, repeat: Infinity, ease: 'easeInOut' } 
+    },
+    extinguished: { 
+      opacity: 0, 
+      scaleY: 0, 
+      scaleX: 0, 
+      transition: { duration: 0.4, ease: 'easeIn' } 
+    }
+  };
+
+  const cyanCoreVariants: Variants = {
     idle: { opacity: 0, scaleY: 0, scaleX: 0 },
     ignition: { opacity: 1, scaleY: [0, 1.8, 1], scaleX: [0.05, 0.2, 1], transition: { duration: 0.3, ease: 'easeOut' } },
-    active: { opacity: 1, scaleY: [1, 1.03, 0.97, 1], scaleX: [1, 0.97, 1.03, 1], transition: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' } },
-    unstable: { opacity: 1, scaleY: [1, 1.05, 0.95, 1], scaleX: [1, 0.95, 1.05, 1], transition: { duration: 0.8, repeat: Infinity, ease: 'easeInOut' } },
-    extinguished: { opacity: 0, scaleY: 0, scaleX: 0, transition: { duration: 0.3, ease: 'easeIn' } }
+    active: { 
+      opacity: 1, 
+      scaleY: [1, 1.03, 0.97, 1], 
+      scaleX: [1, 0.97, 1.03, 1], 
+      transition: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' } 
+    },
+    unstable: { 
+      opacity: 0, 
+      scaleY: 0, 
+      scaleX: 0, 
+      transition: { duration: 1.0 } 
+    },
+    extinguished: { 
+      opacity: 0, 
+      scaleY: 0, 
+      scaleX: 0, 
+      transition: { duration: 0.3, ease: 'easeIn' } 
+    }
   };
 
-
-
-  // Determine if we show noise overlay (more visible during unstable)
-  const isUnstable = state === 'unstable';
+  const redCoreVariants: Variants = {
+    idle: { opacity: 0, scaleY: 0, scaleX: 0 },
+    ignition: { opacity: 0, scaleY: 0, scaleX: 0 },
+    active: { opacity: 0, scaleY: 0, scaleX: 0 },
+    unstable: { 
+      opacity: 1, 
+      scaleY: [1, 1.05, 0.95, 1], 
+      scaleX: [1, 0.95, 1.05, 1], 
+      transition: { duration: 0.8, repeat: Infinity, ease: 'easeInOut' } 
+    },
+    extinguished: { 
+      opacity: 0, 
+      scaleY: 0, 
+      scaleX: 0, 
+      transition: { duration: 0.3, ease: 'easeIn' } 
+    }
+  };
 
   return (
     <div className={`relative flex flex-col items-center justify-end w-64 h-96 ${className}`}>
       
-      {/* The background was removed to make the candle transparent and blend with the main app */}
-
-      {/* Interactive Container */}
       <div 
         className="relative flex flex-col items-center justify-end h-full w-full cursor-pointer pb-12"
         onClick={handleClick}
@@ -124,11 +209,8 @@ export default function AnimeCandle({ state: externalState, onClick, className =
             variants={auraVariants}
             initial="idle"
             animate={state}
-            className="absolute bottom-0 w-32 h-40 rounded-full blur-[40px] pointer-events-none transition-colors duration-1000"
-            style={{ 
-              originY: 1,
-              backgroundColor: state === 'unstable' ? '#ff1e1e' : '#4FC3FF'
-            }}
+            className="absolute bottom-0 w-32 h-40 rounded-full blur-[40px] pointer-events-none"
+            style={{ originY: 1 }}
           />
 
           {/* PARTICLES */}
@@ -142,31 +224,53 @@ export default function AnimeCandle({ state: externalState, onClick, className =
             )}
           </AnimatePresence>
 
-          {/* MID GLOW (Cyan body) */}
+          {/* CYAN MID GLOW (Cyan body) */}
           <motion.div
-            variants={midGlowVariants}
+            variants={cyanMidGlowVariants}
             initial="idle"
             animate={state}
-            className="absolute bottom-0 w-10 h-28 blur-[6px] transition-all duration-1000"
+            className="absolute bottom-0 w-10 h-28 blur-[6px]"
             style={{ 
-              background: state === 'unstable'
-                ? 'linear-gradient(to top, rgba(255, 30, 30, 0), rgba(255, 30, 30, 0.8) 40%, rgba(139, 0, 0, 1))'
-                : 'linear-gradient(to top, rgba(0, 240, 255, 0), rgba(0, 240, 255, 0.8) 40%, rgba(79, 195, 255, 1))',
+              background: 'linear-gradient(to top, rgba(0, 240, 255, 0), rgba(0, 240, 255, 0.8) 40%, rgba(79, 195, 255, 1))',
               borderRadius: '50% 50% 20% 20% / 60% 60% 40% 40%',
               originY: 1
             }}
           />
 
-          {/* INNER CORE (Electric Blue / White) */}
+          {/* RED MID GLOW (Red body) */}
           <motion.div
-            variants={coreVariants}
+            variants={redMidGlowVariants}
             initial="idle"
             animate={state}
-            className="absolute bottom-0 w-4 h-20 blur-[1px] transition-all duration-1000"
+            className="absolute bottom-0 w-10 h-28 blur-[6px]"
             style={{ 
-              background: state === 'unstable'
-                ? 'linear-gradient(to top, #ffffff, #ffebee 20%, #ff1e1e 60%, rgba(255, 30, 30, 0))'
-                : 'linear-gradient(to top, #ffffff, #e0f7fa 20%, #4FC3FF 60%, rgba(79, 195, 255, 0))',
+              background: 'linear-gradient(to top, rgba(255, 30, 30, 0), rgba(255, 30, 30, 0.8) 40%, rgba(139, 0, 0, 1))',
+              borderRadius: '50% 50% 20% 20% / 60% 60% 40% 40%',
+              originY: 1
+            }}
+          />
+
+          {/* CYAN INNER CORE (Electric Blue / White) */}
+          <motion.div
+            variants={cyanCoreVariants}
+            initial="idle"
+            animate={state}
+            className="absolute bottom-0 w-4 h-20 blur-[1px]"
+            style={{ 
+              background: 'linear-gradient(to top, #ffffff, #e0f7fa 20%, #4FC3FF 60%, rgba(79, 195, 255, 0))',
+              borderRadius: '50% 50% 20% 20% / 60% 60% 40% 40%',
+              originY: 1
+            }}
+          />
+
+          {/* RED INNER CORE (Red / White) */}
+          <motion.div
+            variants={redCoreVariants}
+            initial="idle"
+            animate={state}
+            className="absolute bottom-0 w-4 h-20 blur-[1px]"
+            style={{ 
+              background: 'linear-gradient(to top, #ffffff, #ffebee 20%, #ff1e1e 60%, rgba(255, 30, 30, 0))',
               borderRadius: '50% 50% 20% 20% / 60% 60% 40% 40%',
               originY: 1
             }}
@@ -197,23 +301,27 @@ export default function AnimeCandle({ state: externalState, onClick, className =
             <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
             
             {/* The "Wick" area - stylized glow emitter */}
-            <div 
-              className={`absolute top-0 left-1/2 -translate-x-1/2 w-4 h-1 blur-[1px] rounded-full transition-all duration-1000 ${
-                state === 'unstable' 
-                  ? 'bg-[#ff1e1e]/40 shadow-[0_0_10px_#ff1e1e]' 
-                  : 'bg-[#4FC3FF]/40 shadow-[0_0_10px_#4FC3FF]'
-              }`} 
+            <motion.div 
+              animate={{
+                backgroundColor: state === 'unstable' ? 'rgba(255, 30, 30, 0.4)' : 'rgba(79, 195, 255, 0.4)',
+                boxShadow: state === 'unstable' ? '0 0 10px #ff1e1e' : '0 0 10px #4FC3FF',
+              }}
+              transition={{ duration: 1 }}
+              className="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-1 blur-[1px] rounded-full"
             />
             
-            {/* Internal gradient core visible on base */}
+            {/* Internal gradient core visible on base - Cyan */}
             <motion.div 
-              animate={{ opacity: state !== 'idle' && state !== 'extinguished' ? 0.3 : 0.05 }}
-              className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-10 blur-[6px] transition-all duration-1000"
-              style={{
-                background: state === 'unstable'
-                  ? 'linear-gradient(to bottom, #ff1e1e, transparent)'
-                  : 'linear-gradient(to bottom, #4FC3FF, transparent)'
-              }}
+              animate={{ opacity: (state !== 'idle' && state !== 'extinguished' && state !== 'unstable') ? 0.3 : 0.05 }}
+              transition={{ duration: 1 }}
+              className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-10 bg-gradient-to-b from-[#4FC3FF] to-transparent blur-[6px]"
+            />
+
+            {/* Internal gradient core visible on base - Red */}
+            <motion.div 
+              animate={{ opacity: state === 'unstable' ? 0.3 : 0 }}
+              transition={{ duration: 1 }}
+              className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-10 bg-gradient-to-b from-[#ff1e1e] to-transparent blur-[6px]"
             />
           </motion.div>
         )}
@@ -221,15 +329,13 @@ export default function AnimeCandle({ state: externalState, onClick, className =
         {/* Subtle ground reflection */}
         {!hideBase && (
           <motion.div 
-            animate={{ 
-              opacity: state === 'active' || state === 'unstable' ? 0.5 : 0.2,
-              scale: state === 'unstable' ? 1.2 : 1 
-            }}
-            transition={{ duration: 1 }}
-            className="absolute -bottom-6 w-32 h-6 rounded-[100%] blur-[12px] opacity-30 z-0 pointer-events-none transition-colors duration-1000"
+            variants={reflectionVariants}
+            initial="idle"
+            animate={state}
+            className="absolute -bottom-6 w-32 h-6 rounded-[100%] blur-[12px] opacity-30 z-0 pointer-events-none"
             style={{ 
               transform: 'rotateX(70deg)',
-              backgroundColor: state === 'unstable' ? '#ff1e1e' : '#4FC3FF'
+              originY: 0.5,
             }}
           />
         )}
