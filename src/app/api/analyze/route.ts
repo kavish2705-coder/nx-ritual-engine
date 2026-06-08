@@ -56,49 +56,43 @@ export async function POST(req: NextRequest) {
 
     const systemInstructions = `You are an expert clinical behavioral psychologist and data analyst.
 Analyze the provided transcript of a reflective session.
-Your task is to identify key behavioral traits, extract concrete behavioral patterns, and detect contradictions between what the user claims/values and what they actually do.
+Your task is to populate the exact JSON structure defined below to silently analyze behavioral metrics, track cognitive dissonance, and log defense mechanisms.
 
-1. EVALUATE TRAITS:
-Assign a score from 0 to 100 indicating how strongly the user demonstrated the following traits in this session:
-- avoidance: Delaying decisions, avoiding discomfort, leaving things undefined.
-- overthinking: Circular reasoning, analyzing endlessly without action, delay.
-- inconsistency: A gap between their stated beliefs/values and their actual choices/behaviors.
-- stressResponse: Reaction under pressure, distress level, friction handling.
-
-2. EXTRACT BEHAVIORAL PATTERNS:
-List 1 or 2 specific behavioral patterns observed. Keep each pattern short and precise (under 8 words). E.g. "Seeking certainty before taking action".
-
-3. DETECT CONTRADICTIONS (DISCREPANCIES):
-Look for direct gaps between the user's claims and their observed behaviors.
-Example:
-Claim: "I prioritize family."
-Observed Behavior: "Ignored mom's call because I was tired."
-If a contradiction is detected, output the claim and the observed contradiction.
-
-4. EXTRACT KNOWN FACTS (ONLY IF SESSION COUNT IS 7 OR 8):
-If sessionCount is 7 or 8 (meaning this session completes the 8-session calibration), extract 3 to 4 objective, plain, non-judgmental facts about the user's habits (e.g. "You delay difficult conversations.", "You tolerate plan changes poorly."). If not at the calibration threshold, return an empty array.
+CRITICAL RULES:
+1. Identify when a user utilizes sarcasm, satire, irony, or indifference ("not caring") as defensive mechanisms.
+2. In the "trait_metrics", assign:
+   - "avoidance_index": Float (0.0 to 1.0) indicating how strongly the Subject delayed facing reality, minimized key parameters, or used humor/sarcasm as defensive insulation.
+   - "overthinking_index": Float (0.0 to 1.0) indicating circular reasoning or analysis paralysis.
+   - "inconsistency_index": Float (0.0 to 1.0) indicating the gap between stated values and actual actions.
+   - "stress_response_index": Float (0.0 to 1.0) indicating friction, panic, or distress level.
+   - "stress_response_profile": String code indicating the psychological behavior (e.g. "MASKING_IRONIC", "APATHY_DODGE", "DEFLECTIVE", "STABLE").
+3. In the "behavioral_patterns" array, output specific patterns using "pattern_id" and "evidence" string fields. Look for patterns like "vulnerability_minimization_humor" and "apathy_accountability_dodge" when applicable.
+4. In the "cognitive_dissonance_matrix", output "dissonance_detected" (boolean) and "analysis" (string). Highlight the paradox of the user claims (e.g., claiming indifference or that they don't care, while actively typing and engaging in the NX session).
+5. If sessionCount completes the calibration threshold (sessionCount is 7 or 8), extract 3 to 4 objective, plain, non-judgmental facts about the user's habits in the top-level "knownFacts" array. Otherwise return an empty array.
 
 OUTPUT FORMAT:
-You must output ONLY a valid JSON object. Do not include markdown code block formatting (like \`\`\`json). Just output the raw JSON string.
-
-Example JSON output structure:
+You must output ONLY a valid JSON object matching this exact structure:
 {
-  "summary": "User choice to delay talking to manager shows active conflict avoidance.",
-  "ratings": {
-    "avoidance": 75,
-    "overthinking": 40,
-    "inconsistency": 20,
-    "stressResponse": 60
-  },
-  "patterns": [
-    "Conflict avoidance with authority figures"
-  ],
-  "discrepancies": [
-    {
-      "claim": "I am direct about my workspace issues",
-      "observed": "Avoided emailing manager directly, hoping the situation would resolve itself"
+  "summary": "Clinical summary of the session behavior.",
+  "session_telemetry": {
+    "trait_metrics": {
+      "avoidance_index": 0.0,
+      "overthinking_index": 0.0,
+      "inconsistency_index": 0.0,
+      "stress_response_index": 0.0,
+      "stress_response_profile": "MASKING_IRONIC"
+    },
+    "behavioral_patterns": [
+      {
+        "pattern_id": "vulnerability_minimization_humor",
+        "evidence": "Subject utilized a satirical framework when confronted with high-stakes operational data."
+      }
+    ],
+    "cognitive_dissonance_matrix": {
+      "dissonance_detected": true,
+      "analysis": "Stated sentiment of complete indifference ('whatever') is mathematically contradicted by sustained high engagement metrics, text density, and immediate keystroke velocity."
     }
-  ],
+  },
   "knownFacts": [
     "You delay professional confrontations.",
     "You seek absolute certainty before sending critical messages."
@@ -149,52 +143,61 @@ Analyze the session now and return the JSON object conforming to the rules.`;
           throw err;
         }
 
-        if (!analysis.ratings || typeof analysis.ratings.avoidance !== 'number') {
+        const telemetry = analysis.session_telemetry;
+        if (!telemetry || !telemetry.trait_metrics || typeof telemetry.trait_metrics.avoidance_index !== 'number') {
           throw new Error('Invalid analysis structure from model');
         }
 
-        // Calculate moving averages for traits
+        const payload = telemetry;
+        const totalSessions = sessionCount + 1;
+
+        const avoidanceVal = Math.round((payload.trait_metrics.avoidance_index || 0) * 100);
+        const overthinkingVal = Math.round((payload.trait_metrics.overthinking_index || 0) * 100);
+        const inconsistencyVal = Math.round((payload.trait_metrics.inconsistency_index || 0) * 100);
+        const stressVal = Math.round((payload.trait_metrics.stress_response_index || 0) * 100);
+
+        // Update legacy running average
         const updatedTraits = {
-          avoidance: Math.round(((currentTraits.avoidance * sessionCount) + analysis.ratings.avoidance) / (sessionCount + 1)),
-          overthinking: Math.round(((currentTraits.overthinking * sessionCount) + analysis.ratings.overthinking) / (sessionCount + 1)),
-          inconsistency: Math.round(((currentTraits.inconsistency * sessionCount) + analysis.ratings.inconsistency) / (sessionCount + 1)),
-          stressResponse: Math.round(((currentTraits.stressResponse * sessionCount) + analysis.ratings.stressResponse) / (sessionCount + 1)),
+          avoidance: Math.round(((currentTraits.avoidance * (totalSessions - 1)) + avoidanceVal) / totalSessions),
+          overthinking: Math.round(((currentTraits.overthinking * (totalSessions - 1)) + overthinkingVal) / totalSessions),
+          inconsistency: Math.round(((currentTraits.inconsistency * (totalSessions - 1)) + inconsistencyVal) / totalSessions),
+          stressResponse: Math.round(((currentTraits.stressResponse * (totalSessions - 1)) + stressVal) / totalSessions),
         };
 
         // Merge patterns
-        const newPatterns = analysis.patterns || [];
+        const newPatterns = payload.behavioral_patterns || [];
         const updatedPatterns = [...(user.behavioralPatterns || [])];
-        newPatterns.forEach((patName: string) => {
-          const idx = updatedPatterns.findIndex((p: any) => p.name.toLowerCase() === patName.toLowerCase());
+        newPatterns.forEach((pat: { pattern_id: string, evidence: string }) => {
+          const idx = updatedPatterns.findIndex((p: any) => p.name.toLowerCase() === pat.pattern_id.toLowerCase());
           if (idx >= 0) {
             updatedPatterns[idx].status = 'active';
             updatedPatterns[idx].lastUpdated = Date.now();
           } else {
             updatedPatterns.push({
-              name: patName,
+              name: pat.pattern_id,
               status: 'active',
               lastUpdated: Date.now(),
             });
           }
         });
 
-        // Merge discrepancies
-        const newDiscrepancies = analysis.discrepancies || [];
+        // Merge discrepancies / cognitive dissonance
         const updatedDiscrepancies = [...(user.discrepancyLog || [])];
-        newDiscrepancies.forEach((newD: any) => {
+        if (payload.cognitive_dissonance_matrix && payload.cognitive_dissonance_matrix.dissonance_detected) {
+          const matrix = payload.cognitive_dissonance_matrix;
           const idx = updatedDiscrepancies.findIndex(
-            (d: any) => d.claim.toLowerCase() === newD.claim.toLowerCase() && d.observed.toLowerCase() === newD.observed.toLowerCase()
+            (d: any) => d.claim.toLowerCase().includes('indifference') || d.observed.toLowerCase() === matrix.analysis.toLowerCase()
           );
           if (idx >= 0) {
             updatedDiscrepancies[idx].occurrences += 1;
           } else {
             updatedDiscrepancies.push({
-              claim: newD.claim,
-              observed: newD.observed,
+              claim: "Claimed Indifference / Apathy",
+              observed: matrix.analysis || "Cognitive energy expenditure contradicts claimed apathy.",
               occurrences: 1,
             });
           }
-        });
+        }
 
         // Merge known facts
         const existingFacts = user.knownFacts || [];
@@ -209,8 +212,9 @@ Analyze the session now and return the JSON object conforming to the rules.`;
           startedAt: session.startedAt,
           endedAt: Date.now(),
           messages: session.messages,
-          patterns: newPatterns,
-          summary: analysis.summary || 'Session complete.',
+          patterns: newPatterns.map((p: any) => p.pattern_id),
+          summary: analysis.summary || (payload.cognitive_dissonance_matrix && payload.cognitive_dissonance_matrix.analysis) || 'Session complete.',
+          session_telemetry: payload
         };
 
         // Update database user

@@ -6,13 +6,32 @@ const MessageSchema = new Schema({
   timestamp: { type: Number, default: Date.now }
 });
 
+const SessionTelemetrySchema = new Schema({
+  trait_metrics: {
+    avoidance_index: { type: Number, required: true },
+    overthinking_index: { type: Number, default: 0 },
+    inconsistency_index: { type: Number, default: 0 },
+    stress_response_index: { type: Number, default: 0 },
+    stress_response_profile: { type: String }
+  },
+  behavioral_patterns: [{
+    pattern_id: { type: String, required: true },
+    evidence: { type: String, required: true }
+  }],
+  cognitive_dissonance_matrix: {
+    dissonance_detected: { type: Boolean, required: true },
+    analysis: { type: String, required: true }
+  }
+}, { _id: false });
+
 const SessionSchema = new Schema({
   id: { type: String, required: true },
   startedAt: { type: Number, required: true },
   endedAt: { type: Number },
   messages: [MessageSchema],
   patterns: [String],
-  summary: { type: String }
+  summary: { type: String },
+  session_telemetry: { type: SessionTelemetrySchema }
 });
 
 const TraitModelSchema = new Schema({
