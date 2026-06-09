@@ -47,6 +47,85 @@ const SmokeParticle = ({ index }: { index: number }) => {
   );
 };
 
+const TypewriterLine = ({
+  text,
+  delay = 0,
+  speed = 50,
+  fontWeight = 'bold',
+  fontSize = 'clamp(18px, 4vw, 24px)',
+  marginBottom = '20px',
+}: {
+  text: string;
+  delay?: number;
+  speed?: number;
+  fontWeight?: string | number;
+  fontSize?: string;
+  marginBottom?: string;
+}) => {
+  const [displayedText, setDisplayedText] = useState("");
+  const [started, setStarted] = useState(false);
+  const [isDone, setIsDone] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    const startTimeout = setTimeout(() => {
+      if (!isMounted) return;
+      setStarted(true);
+      let currentText = "";
+      let index = 0;
+      const interval = setInterval(() => {
+        if (!isMounted) return;
+        if (index < text.length) {
+          currentText += text[index];
+          setDisplayedText(currentText);
+          index++;
+        } else {
+          clearInterval(interval);
+          setIsDone(true);
+        }
+      }, speed);
+      return () => clearInterval(interval);
+    }, delay);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(startTimeout);
+    };
+  }, [text, delay, speed]);
+
+  return (
+    <p
+      style={{
+        fontFamily: 'Georgia, serif',
+        fontSize,
+        fontWeight,
+        lineHeight: '1.8',
+        color: 'rgba(226, 232, 240, 0.95)',
+        letterSpacing: '0.05em',
+        textShadow: '0 0 8px rgba(226, 232, 240, 0.15)',
+        marginBottom,
+        display: 'block',
+        minHeight: '1.8em',
+      }}
+    >
+      {displayedText}
+      {started && !isDone && (
+        <span
+          style={{
+            animation: 'cursorBlink 1.0s step-end infinite',
+            color: '#60a5fa',
+            marginLeft: '2px',
+            fontWeight: 'normal',
+            display: 'inline-block',
+          }}
+        >
+          |
+        </span>
+      )}
+    </p>
+  );
+};
+
 export default function RitualView({ memory, onEnd }: Props) {
   const [session] = useState<Session>(() => createSession());
   const [messages, setMessages] = useState<Message[]>([]);
@@ -307,7 +386,7 @@ export default function RitualView({ memory, onEnd }: Props) {
           }, 11800);
           setTimeout(() => {
             setEndingStep(3);
-          }, 19300);
+          }, 19700);
         } else {
           onEnd(mem);
         }
@@ -354,7 +433,7 @@ export default function RitualView({ memory, onEnd }: Props) {
           }, 11800);
           setTimeout(() => {
             setEndingStep(3);
-          }, 19300);
+          }, 19700);
         } else {
           onEnd(mem);
         }
@@ -939,87 +1018,36 @@ export default function RitualView({ memory, onEnd }: Props) {
                       textAlign: 'center',
                     }}
                   >
-                    <p
-                      style={{
-                        fontFamily: 'Georgia, serif',
-                        fontSize: 'clamp(18px, 4vw, 24px)',
-                        fontWeight: 'bold',
-                        lineHeight: '1.8',
-                        color: 'rgba(226, 232, 240, 0.95)',
-                        letterSpacing: '0.05em',
-                        textShadow: '0 0 8px rgba(226, 232, 240, 0.15)',
-                        marginBottom: '20px',
-                      }}
-                    >
-                      {Array.from("To thine own self be true.").map((char, i) => (
-                        <motion.span
-                          key={i}
-                          initial={{ opacity: 0, filter: 'blur(4px)' }}
-                          animate={{ opacity: 1, filter: 'blur(0px)' }}
-                          transition={{
-                            delay: i * 0.05,
-                            duration: 0.4,
-                          }}
-                          style={{ display: 'inline-block', whiteSpace: char === ' ' ? 'pre' : 'normal' }}
-                        >
-                          {char}
-                        </motion.span>
-                      ))}
-                    </p>
-                    <p
-                      style={{
-                        fontFamily: 'Georgia, serif',
-                        fontSize: 'clamp(18px, 4vw, 24px)',
-                        fontWeight: 'bold',
-                        lineHeight: '1.8',
-                        color: 'rgba(226, 232, 240, 0.95)',
-                        letterSpacing: '0.05em',
-                        textShadow: '0 0 8px rgba(226, 232, 240, 0.15)',
-                        marginBottom: '16px',
-                      }}
-                    >
-                      {Array.from("For thy deceptions learn thy name before the world doth.").map((char, i) => (
-                        <motion.span
-                          key={i}
-                          initial={{ opacity: 0, filter: 'blur(4px)' }}
-                          animate={{ opacity: 1, filter: 'blur(0px)' }}
-                          transition={{
-                            delay: 2.0 + i * 0.05,
-                            duration: 0.4,
-                          }}
-                          style={{ display: 'inline-block', whiteSpace: char === ' ' ? 'pre' : 'normal' }}
-                        >
-                          {char}
-                        </motion.span>
-                      ))}
-                    </p>
-                    <p
+                    <TypewriterLine
+                      text='"To thine own self be true.'
+                      delay={0}
+                      speed={50}
+                      marginBottom="20px"
+                    />
+                    <TypewriterLine
+                      text='For thy deceptions learn thy name before the world doth."'
+                      delay={1550}
+                      speed={50}
+                      marginBottom="16px"
+                    />
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 0.35 }}
+                      transition={{ delay: 5.9, duration: 1.2 }}
                       style={{
                         fontFamily: 'Georgia, serif',
                         fontStyle: 'italic',
                         fontSize: 'clamp(14px, 3vw, 18px)',
                         fontWeight: 500,
-                        color: 'rgba(226, 232, 240, 0.55)',
+                        color: 'rgba(226, 232, 240, 0.75)',
                         letterSpacing: '0.05em',
                         textShadow: '0 0 6px rgba(226, 232, 240, 0.10)',
-                        marginTop: '12px',
+                        marginTop: '24px',
+                        display: 'block',
                       }}
                     >
-                      {Array.from("--shakespeare").map((char, i) => (
-                        <motion.span
-                          key={i}
-                          initial={{ opacity: 0, filter: 'blur(4px)' }}
-                          animate={{ opacity: 1, filter: 'blur(0px)' }}
-                          transition={{
-                            delay: 5.5 + i * 0.05,
-                            duration: 0.4,
-                          }}
-                          style={{ display: 'inline-block', whiteSpace: char === ' ' ? 'pre' : 'normal' }}
-                        >
-                          {char}
-                        </motion.span>
-                      ))}
-                    </p>
+                      — William Shakespeare
+                    </motion.p>
                   </div>
 
                   {endingStep === 3 && (
