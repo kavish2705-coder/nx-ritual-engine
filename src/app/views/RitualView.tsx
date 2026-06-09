@@ -307,7 +307,7 @@ export default function RitualView({ memory, onEnd }: Props) {
           }, 11800);
           setTimeout(() => {
             setEndingStep(3);
-          }, 16800);
+          }, 19300);
         } else {
           onEnd(mem);
         }
@@ -354,7 +354,7 @@ export default function RitualView({ memory, onEnd }: Props) {
           }, 11800);
           setTimeout(() => {
             setEndingStep(3);
-          }, 16800);
+          }, 19300);
         } else {
           onEnd(mem);
         }
@@ -942,17 +942,16 @@ export default function RitualView({ memory, onEnd }: Props) {
                     <p
                       style={{
                         fontFamily: 'Georgia, serif',
-                        fontStyle: 'italic',
                         fontSize: 'clamp(18px, 4vw, 24px)',
-                        fontWeight: 300,
+                        fontWeight: 'bold',
                         lineHeight: '1.8',
-                        color: 'rgba(226, 232, 240, 0.85)',
+                        color: 'rgba(226, 232, 240, 0.95)',
                         letterSpacing: '0.05em',
                         textShadow: '0 0 8px rgba(226, 232, 240, 0.15)',
                         marginBottom: '20px',
                       }}
                     >
-                      {Array.from("Thou needst not fear the darkness.").map((char, i) => (
+                      {Array.from("To thine own self be true.").map((char, i) => (
                         <motion.span
                           key={i}
                           initial={{ opacity: 0, filter: 'blur(4px)' }}
@@ -970,22 +969,49 @@ export default function RitualView({ memory, onEnd }: Props) {
                     <p
                       style={{
                         fontFamily: 'Georgia, serif',
-                        fontStyle: 'italic',
                         fontSize: 'clamp(18px, 4vw, 24px)',
-                        fontWeight: 300,
+                        fontWeight: 'bold',
                         lineHeight: '1.8',
-                        color: 'rgba(226, 232, 240, 0.85)',
+                        color: 'rgba(226, 232, 240, 0.95)',
                         letterSpacing: '0.05em',
                         textShadow: '0 0 8px rgba(226, 232, 240, 0.15)',
+                        marginBottom: '16px',
                       }}
                     >
-                      {Array.from("Fear instead the part of thee that findeth comfort within it.").map((char, i) => (
+                      {Array.from("For thy deceptions learn thy name before the world doth.").map((char, i) => (
                         <motion.span
                           key={i}
                           initial={{ opacity: 0, filter: 'blur(4px)' }}
                           animate={{ opacity: 1, filter: 'blur(0px)' }}
                           transition={{
                             delay: 2.0 + i * 0.05,
+                            duration: 0.4,
+                          }}
+                          style={{ display: 'inline-block', whiteSpace: char === ' ' ? 'pre' : 'normal' }}
+                        >
+                          {char}
+                        </motion.span>
+                      ))}
+                    </p>
+                    <p
+                      style={{
+                        fontFamily: 'Georgia, serif',
+                        fontStyle: 'italic',
+                        fontSize: 'clamp(14px, 3vw, 18px)',
+                        fontWeight: 500,
+                        color: 'rgba(226, 232, 240, 0.55)',
+                        letterSpacing: '0.05em',
+                        textShadow: '0 0 6px rgba(226, 232, 240, 0.10)',
+                        marginTop: '12px',
+                      }}
+                    >
+                      {Array.from("--shakespeare").map((char, i) => (
+                        <motion.span
+                          key={i}
+                          initial={{ opacity: 0, filter: 'blur(4px)' }}
+                          animate={{ opacity: 1, filter: 'blur(0px)' }}
+                          transition={{
+                            delay: 5.5 + i * 0.05,
                             duration: 0.4,
                           }}
                           style={{ display: 'inline-block', whiteSpace: char === ' ' ? 'pre' : 'normal' }}
