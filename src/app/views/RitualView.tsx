@@ -8,6 +8,7 @@ import {
   NXMemory, Session, Message,
   createSession, addMessage, saveMemory,
   buildSystemPrompt, getDaysSinceLast,
+  getInstructionsText,
 } from '../lib/memory';
 
 interface Props {
@@ -67,85 +68,7 @@ export default function RitualView({ memory, onEnd }: Props) {
 
   const apiKey = typeof window !== 'undefined' ? localStorage.getItem('nx_api_key') || '' : '';
 
-  // --- Dynamic Typewriter Instruction Selection ---
-  const getInstructionsText = (count: number) => {
-    if (count === 0) {
-      return [
-        "You are already structuring a narrative to make yourself look reasonable.",
-        "Stop.",
-        "Think of the exact moment you took the easy way out.",
-        "The conversation you sidestepped.",
-        "Write down what happened.",
-        "Leave out the part where you felt bad about it.",
-        "Just the events."
-      ];
-    } else if (count === 1) {
-      return [
-        "There is a recent interaction that is still bothering you.",
-        "You already know which one it is.",
-        "The one you keep replaying in your head to prove you were right.",
-        "Write it down.",
-        "Include the exact detail you usually leave out to ensure others side with you."
-      ];
-    } else if (count === 2) {
-      return [
-        "You judge others for flaws you secretly share.",
-        "Think of a rule you expect everyone else to follow.",
-        "Now recall the moment you quietly broke it.",
-        "You convinced yourself you had a good reason.",
-        "You did not.",
-        "Describe the exact gap between the person you claim to be, and the person you actually are."
-      ];
-    } else if (count === 3) {
-      return [
-        "You use confusion as a hiding place.",
-        "There is a choice you are actively delaying.",
-        "You pretend you need more information before you act.",
-        "You do not. You already know what has to be done.",
-        "You are just terrified of the fallout.",
-        "Stop hiding behind fake logic.",
-        "Name the decision you are too scared to make."
-      ];
-    } else if (count === 4) {
-      return [
-        "It is easy to be decent when nothing is at stake.",
-        "Think about the last time you were truly cornered.",
-        "The exact moment the pressure hit.",
-        "You panicked, lashed out, or quietly let someone else take the fall.",
-        "Do not write about the problem itself.",
-        "Write about the moment your character broke."
-      ];
-    } else if (count === 5) {
-      return [
-        "There is a fire you are pretending not to smell.",
-        "An unread text.",
-        "A hard conversation.",
-        "A boundary you are afraid to draw.",
-        "You are hoping the problem will just die of old age if you wait long enough.",
-        "It will not.",
-        "Stop looking away. State exactly what you are ignoring."
-      ];
-    } else if (count === 6) {
-      return [
-        "You keep acting surprised by the traps you set for yourself.",
-        "The faces change, but your script never does.",
-        "You just played the exact same role in a very familiar disaster.",
-        "Think of the moment you saw all the warning signs.",
-        "And chose to walk right past them anyway.",
-        "Write it down."
-      ];
-    } else {
-      return [
-        "This is the final pass.",
-        "Everything you have shared so far was just the warmup.",
-        "There is a specific incident you have deliberately kept out of these logs.",
-        "The one you are desperately hoping does not count.",
-        "The one making you hold your breath right now.",
-        "The act is over.",
-        "Write it down."
-      ];
-    }
-  };
+
 
   const sentences = useMemo(() => getInstructionsText(memory.sessionCount), [memory.sessionCount]);
   const [typedLines, setTypedLines] = useState<string[]>([]);

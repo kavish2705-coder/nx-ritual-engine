@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { connectToDatabase } from '../../lib/mongodb';
 import UserMemory from '../../models/UserMemory';
+import { getSessionTheme, getInstructionsText } from '../../lib/memory';
 
 const MODELS = [
   ...(process.env.GEMINI_MODEL ? [process.env.GEMINI_MODEL] : []),
@@ -69,6 +70,7 @@ CRITICAL RULES:
 3. In the "behavioral_patterns" array, output specific patterns using "pattern_id" and "evidence" string fields. Look for patterns like "vulnerability_minimization_humor" and "apathy_accountability_dodge" when applicable.
 4. In the "cognitive_dissonance_matrix", output "dissonance_detected" (boolean) and "analysis" (string). Highlight the paradox of the user claims (e.g., claiming indifference or that they don't care, while actively typing and engaging in the NX session).
 5. If sessionCount completes the calibration threshold (sessionCount is 7 or 8), extract 3 to 4 objective, plain, non-judgmental facts about the user's habits in the top-level "knownFacts" array. Otherwise return an empty array.
+6. Evaluate the Subject's behavior, traits, and discrepancies specifically in the context of the current session's objective (stated in the prompt under CURRENT SESSION OBJECTIVE). Identify if they evaded or successfully addressed the target topic.
 
 OUTPUT FORMAT:
 You must output ONLY a valid JSON object matching this exact structure:
@@ -99,8 +101,15 @@ You must output ONLY a valid JSON object matching this exact structure:
   ]
 }`;
 
+    const currentTheme = getSessionTheme(sessionCount);
+    const currentInstructions = getInstructionsText(sessionCount).join(' | ');
+
     const prompt = `[SESSION COUNT]
 ${sessionCount}
+
+[CURRENT SESSION OBJECTIVE]
+Theme: ${currentTheme}
+Instructions: ${currentInstructions}
 
 [EXISTING DISCREPANCIES IN MEMORY]
 ${JSON.stringify(discrepancyLog)}
