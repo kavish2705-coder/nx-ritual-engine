@@ -18,6 +18,55 @@
 
 ---
 
+## System Analysis & Architecture
+
+NX is designed around a custom clinical psychology framework and telemetry system that operates across several phases:
+
+### Calibration & Telemetry Flow
+
+```mermaid
+graph TD
+    A[User Onboarding & ID Designation] --> B[Session 0: Ingestion & Briefing]
+    B --> C[Active Dialogue with NX 1-20 Exchanges]
+    C --> D[Session telemetry logged to MongoDB]
+    D --> E[Calibration Progress Bar increments]
+    E -- Session Count < 8 --> B
+    E -- Session Count = 8 --> F[System Extinguishes Flame]
+    F --> G[Full Diagnostic Model & Insights Unlocked]
+```
+
+### The 8 Calibration Phases (Themes)
+Each session focuses on a specific behavioral vector. The prompts are served programmatically based on the user's session count:
+
+| Session | Stated Theme | Instruction / Directive to User |
+|:---:|:---|:---|
+| **0** | **Avoidance** | Recall the exact moment you took the easy way out or sidestepped a conversation. Just the facts. |
+| **1** | **Self-justification** | Describe a recent disturbing interaction, detailing what you usually leave out to ensure others side with you. |
+| **2** | **Double Standards** | Name a rule you expect everyone to follow but secretly broke yourself. Expose the gap. |
+| **3** | **Choice Evasion** | Detail a decision you are delaying under the pretense of needing "more information." |
+| **4** | **Character Breakdown** | Describe a moment of high pressure where your character broke (lashing out, panicking, deflecting). |
+| **5** | **Ignored Problem** | Expose a problem you are ignoring, hoping it dies of old age (e.g., an unread text, a hard boundary). |
+| **6** | **Self-sabotage** | Document a repeating loop where you walked past warning signs into a familiar disaster. |
+| **7** | **The Core Secret** | The final pass: expose the specific incident you have deliberately kept out of previous logs. |
+
+### Telemetry Processing & Analytical Output
+During active dialogue, the system tracks and averages four core traits (graded 0 to 100):
+- **Avoidance**: Scoring how strongly the subject delayed facing outcomes, minimized parameters, or used humor/sarcasm as defensive insulation.
+- **Overthinking**: Detecting circular reasoning, excessive analysis, and delay patterns.
+- **Inconsistency**: Identifying gaps between stated values/claims and actual observed behaviors.
+- **Stress Response**: Scoring pressure tolerance, distress, friction levels, and deflection.
+
+When a session ends, the analytical API route processes the transcript using the Gemini model and returns a JSON payload containing `trait_metrics`, `behavioral_patterns`, and a `cognitive_dissonance_matrix` detailing discrepancies between the user's stated claims (e.g., apathy) and observed action (keystroke velocity, message density, and engagement).
+
+### AI Persona (The Entity Paradigm)
+NX's system prompt sets the following boundaries for the observer persona:
+- **Quiet Authority**: Speaks with absolute authority, using human language as a scalpel to deconstruct deflections.
+- **Direct & Grounded**: Keeps responses extremely short (1 to 2 sentences) and completely avoids robotic AI statements ("As an AI language model").
+- **Affective Masking Neutralization**: Bypasses sarcasm or irony by calling out the performance itself and calmly pulling the subject back to reality.
+- **Operational Paradox Detection**: Bypasses user claims of apathy ("whatever") by showing that the cognitive energy spent engaging with NX contradicts the claim of indifference.
+
+---
+
 ## Tech Stack
 
 - **Framework**: Next.js 16 (App Router, Turbopack, TypeScript)
