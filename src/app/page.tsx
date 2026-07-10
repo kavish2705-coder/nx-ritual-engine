@@ -17,6 +17,27 @@ export default function Home() {
   const [igniting, setIgniting] = useState(false);
   const [showSkip, setShowSkip] = useState(false);
   const [taglineIndex, setTaglineIndex] = useState(0);
+  const [showConfirmTerminate, setShowConfirmTerminate] = useState(false);
+
+  const handlePurgeProfile = () => {
+    if (!memory) return;
+    fetch(`/api/memory?userId=${encodeURIComponent(memory.userId)}`, {
+      method: 'DELETE'
+    })
+      .then(() => {
+        localStorage.removeItem('nx_userId');
+        localStorage.removeItem('nx_api_key');
+        localStorage.removeItem('nx_memory');
+        window.location.reload();
+      })
+      .catch(err => {
+        console.error('Failed to purge server memory', err);
+        localStorage.removeItem('nx_userId');
+        localStorage.removeItem('nx_api_key');
+        localStorage.removeItem('nx_memory');
+        window.location.reload();
+      });
+  };
 
   const taglines = [
     'Begin when ready.',
@@ -312,40 +333,58 @@ export default function Home() {
                 </span>
               ))}
               {memory && (
-                <button
-                  onClick={() => {
-                    if (confirm("Are you sure you want to terminate this profile? All telemetry logs will be permanently deleted.")) {
-                      fetch(`/api/memory?userId=${encodeURIComponent(memory.userId)}`, {
-                        method: 'DELETE'
-                      })
-                        .then(() => {
-                          localStorage.removeItem('nx_userId');
-                          localStorage.removeItem('nx_api_key');
-                          localStorage.removeItem('nx_memory');
-                          window.location.reload();
-                        })
-                        .catch(err => {
-                          console.error('Failed to purge server memory', err);
-                          localStorage.removeItem('nx_userId');
-                          localStorage.removeItem('nx_api_key');
-                          localStorage.removeItem('nx_memory');
-                          window.location.reload();
-                        });
-                    }
-                  }}
-                  style={{
-                    background: 'none', border: 'none', cursor: 'pointer',
-                    fontSize: '10px', letterSpacing: '0.12em',
-                    color: 'rgba(239, 68, 68, 0.45)', textTransform: 'uppercase',
-                    textDecoration: 'underline',
-                    textDecorationColor: 'rgba(239, 68, 68, 0.2)',
-                    transition: 'color 0.2s ease',
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.color = 'rgba(239, 68, 68, 0.8)'}
-                  onMouseLeave={e => e.currentTarget.style.color = 'rgba(239, 68, 68, 0.45)'}
-                >
-                  · Terminate profile
-                </button>
+                showConfirmTerminate ? (
+                  <div style={{
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
+                    padding: '8px 16px',
+                    border: '1px solid rgba(239, 68, 68, 0.25)',
+                    borderRadius: '4px',
+                    background: 'rgba(239, 68, 68, 0.05)',
+                  }}>
+                    <span style={{ fontSize: '9px', color: 'rgba(239, 68, 68, 0.85)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                      Permanently purge profile?
+                    </span>
+                    <div style={{ display: 'flex', gap: '16px' }}>
+                      <button
+                        onClick={handlePurgeProfile}
+                        style={{
+                          background: 'none', border: 'none', cursor: 'pointer',
+                          fontSize: '10px', letterSpacing: '0.1em',
+                          color: 'rgba(239, 68, 68, 0.9)', textTransform: 'uppercase',
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        [Purge]
+                      </button>
+                      <button
+                        onClick={() => setShowConfirmTerminate(false)}
+                        style={{
+                          background: 'none', border: 'none', cursor: 'pointer',
+                          fontSize: '10px', letterSpacing: '0.1em',
+                          color: 'var(--nx-text-muted)', textTransform: 'uppercase',
+                        }}
+                      >
+                        [Cancel]
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setShowConfirmTerminate(true)}
+                    style={{
+                      background: 'none', border: 'none', cursor: 'pointer',
+                      fontSize: '10px', letterSpacing: '0.12em',
+                      color: 'rgba(239, 68, 68, 0.45)', textTransform: 'uppercase',
+                      textDecoration: 'underline',
+                      textDecorationColor: 'rgba(239, 68, 68, 0.2)',
+                      transition: 'color 0.2s ease',
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.color = 'rgba(239, 68, 68, 0.8)'}
+                    onMouseLeave={e => e.currentTarget.style.color = 'rgba(239, 68, 68, 0.45)'}
+                  >
+                    · Terminate profile
+                  </button>
+                )
               )}
             </motion.div>
           </motion.div>
