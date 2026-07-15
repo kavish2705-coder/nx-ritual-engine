@@ -13,8 +13,19 @@ export default function BackgroundMusic() {
 
     audio.volume = 0.5;
 
+    // Restore saved time and state
+    const savedTime = sessionStorage.getItem('bgMusicTime');
+    const savedState = sessionStorage.getItem('bgMusicState');
+
+    if (savedTime) {
+      audio.currentTime = parseFloat(savedTime);
+    }
+
     const tryPlay = async () => {
+      // If user explicitly paused it previously, don't autoplay
+      if (savedState === 'paused') return;
       if (!audio.paused) return;
+      
       try {
         await audio.play();
         setIsPlaying(true);
@@ -30,7 +41,7 @@ export default function BackgroundMusic() {
 
     // Add event listeners to play on first user interaction
     const handleInteraction = () => {
-      if (audio.paused) {
+      if (audio.paused && savedState !== 'paused') {
         tryPlay();
       } else {
         cleanup();
@@ -58,6 +69,7 @@ export default function BackgroundMusic() {
       audio.play().then(() => {
         setIsPlaying(true);
         setIsError(false);
+        sessionStorage.setItem('bgMusicState', 'playing');
       }).catch(e => {
         console.error("Failed to play audio on click", e);
         setIsError(true);
@@ -65,7 +77,24 @@ export default function BackgroundMusic() {
     } else {
       audio.pause();
       setIsPlaying(false);
+      sessionStorage.setItem('bgMusicState', 'paused');
     }
+  };
+
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      sessionStorage.setItem('bgMusicTime', audioRef.current.currentTime.toString());
+    }
+  };
+
+  const handlePlay = () => {
+    setIsPlaying(true);
+    sessionStorage.setItem('bgMusicState', 'playing');
+  };
+
+  const handlePause = () => {
+    setIsPlaying(false);
+    sessionStorage.setItem('bgMusicState', 'paused');
   };
 
   return (
@@ -76,8 +105,9 @@ export default function BackgroundMusic() {
         src="/into-the-void.mp3" 
         preload="auto"
         autoPlay
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
+        onPlay={handlePlay}
+        onPause={handlePause}
+        onTimeUpdate={handleTimeUpdate}
       />
       <button 
         onClick={toggleMusic}
