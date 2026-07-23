@@ -10,17 +10,7 @@ interface Props {
 export default function OnboardingView({ onComplete }: Props) {
   const [step, setStep] = useState(0);
   const [name, setName] = useState('');
-  const [apiKey, setApiKey] = useState('');
   const [acknowledged, setAcknowledged] = useState(false);
-  const [serverHasKey, setServerHasKey] = useState<boolean | null>(null);
-
-  // Check if server already has an API key configured
-  useEffect(() => {
-    fetch('/api/config')
-      .then(r => r.json())
-      .then(d => setServerHasKey(d.configured))
-      .catch(() => setServerHasKey(false));
-  }, []);
 
   // Steps — API key step is conditionally included
   const allSteps = [
@@ -114,52 +104,9 @@ export default function OnboardingView({ onComplete }: Props) {
       ),
       canProceed: () => name.trim().length >= 2,
     },
-    // API key step — only shown when no server key is configured
-    ...(!serverHasKey ? [{
-      id: 'api',
-      content: (
-        <div style={{ textAlign: 'center' }}>
-          <p style={{
-            fontFamily: 'Space Mono, monospace',
-            fontSize: '11px', letterSpacing: '0.2em',
-            color: 'rgba(59,130,246,0.5)', textTransform: 'uppercase',
-            marginBottom: '32px',
-          }}>Connection</p>
-          <p style={{
-            fontSize: '14px', color: 'var(--nx-text-dim)',
-            marginBottom: '8px', letterSpacing: '0.02em',
-          }}>
-            Gemini API key required.
-          </p>
-          <p style={{ fontSize: '11px', color: 'var(--nx-text-muted)', marginBottom: '40px', letterSpacing: '0.05em' }}>
-            Stored in your browser only. Never sent externally.{' '}
-            <a
-              href="https://aistudio.google.com/app/apikey"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: 'rgba(59,130,246,0.5)', textDecoration: 'underline' }}
-            >
-              Get a free key →
-            </a>
-          </p>
-          <div style={{ maxWidth: '400px', margin: '0 auto' }}>
-            <input
-              className="nx-input"
-              type="password"
-              placeholder="AIza..."
-              value={apiKey}
-              onChange={e => setApiKey(e.target.value)}
-              autoFocus
-            />
-          </div>
-        </div>
-      ),
-      canProceed: () => apiKey.trim().length > 10,
-    }] : []),
   ];
 
-  // Wait until we know if server has key
-  const steps = serverHasKey === null ? [] : allSteps;
+  const steps = allSteps;
 
   const handleNext = () => {
     if (step < steps.length - 1) {
@@ -167,9 +114,6 @@ export default function OnboardingView({ onComplete }: Props) {
     } else {
       // Complete onboarding
       const mem = createMemory(name.trim());
-      if (apiKey.trim()) {
-        localStorage.setItem('nx_api_key', apiKey.trim());
-      }
       saveMemory(mem);
       onComplete(mem);
     }
@@ -177,23 +121,6 @@ export default function OnboardingView({ onComplete }: Props) {
 
   const canProceed = steps[step]?.canProceed() ?? false;
 
-  // Loading state
-  if (serverHasKey === null) {
-    return (
-      <div style={{
-        minHeight: '100vh', display: 'flex',
-        alignItems: 'center', justifyContent: 'center',
-      }}>
-        <motion.div
-          animate={{ opacity: [0.3, 0.7, 0.3] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          style={{ fontSize: '11px', letterSpacing: '0.2em', color: 'var(--nx-text-muted)', textTransform: 'uppercase' }}
-        >
-          Establishing connection...
-        </motion.div>
-      </div>
-    );
-  }
 
   return (
     <div style={{

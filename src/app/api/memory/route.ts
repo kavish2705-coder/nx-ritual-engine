@@ -14,8 +14,9 @@ export async function GET(req: NextRequest) {
     await connectToDatabase();
 
     // Case-insensitive user lookup
+    const escapedUserId = userId.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');
     const user = await UserMemory.findOne({
-      userId: { $regex: new RegExp(`^${userId}$`, 'i') }
+      userId: { $regex: new RegExp(`^${escapedUserId}$`, 'i') }
     });
 
     if (!user) {
@@ -69,8 +70,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Atomic upsert prevents concurrent double-creation race conditions
+    const escapedUserId = userId.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');
     const user = await UserMemory.findOneAndUpdate(
-      { userId: { $regex: new RegExp(`^${userId}$`, 'i') } },
+      { userId: { $regex: new RegExp(`^${escapedUserId}$`, 'i') } },
       {
         $setOnInsert: setOnInsertObj,
         $set: setObj
@@ -82,7 +84,7 @@ export async function POST(req: NextRequest) {
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     console.error('[API Memory POST Error]', message);
-    return NextResponse.json({ error: 'Database operation failed' }, { status: 500 });
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -97,8 +99,9 @@ export async function DELETE(req: NextRequest) {
 
     await connectToDatabase();
 
+    const escapedUserId = userId.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');
     const result = await UserMemory.deleteOne({
-      userId: { $regex: new RegExp(`^${userId}$`, 'i') }
+      userId: { $regex: new RegExp(`^${escapedUserId}$`, 'i') }
     });
 
     if (result.deletedCount === 0) {

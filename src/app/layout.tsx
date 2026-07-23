@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import BackgroundMusic from "../components/BackgroundMusic";
+import AbyssBackground from "./components/AbyssBackground";
 
 
 export const metadata: Metadata = {
@@ -29,6 +30,7 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <AbyssBackground />
         <BackgroundMusic />
         {children}
       </body>

@@ -145,7 +145,6 @@ export default function RitualView({ memory, onEnd }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const apiKey = typeof window !== 'undefined' ? localStorage.getItem('nx_api_key') || '' : '';
 
 
 
@@ -226,7 +225,6 @@ export default function RitualView({ memory, onEnd }: Props) {
         body: JSON.stringify({
           messages: [userMsg],
           systemPrompt,
-          apiKey,
         }),
       });
 
@@ -310,7 +308,6 @@ export default function RitualView({ memory, onEnd }: Props) {
         body: JSON.stringify({
           messages: updatedMessages,
           systemPrompt,
-          apiKey,
         }),
       });
 
@@ -338,7 +335,7 @@ export default function RitualView({ memory, onEnd }: Props) {
         inputRef.current?.focus();
       }, 100);
     }
-  }, [input, loading, phase, messages, exchangeCount, memory, apiKey]);
+  }, [input, loading, phase, messages, exchangeCount, memory]);
 
   // End session with full AI analysis
   const handleEnd = async () => {
@@ -356,7 +353,6 @@ export default function RitualView({ memory, onEnd }: Props) {
         body: JSON.stringify({
           userId: memory.userId,
           session: finalSession,
-          apiKey,
         }),
       });
 

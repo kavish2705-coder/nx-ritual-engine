@@ -113,17 +113,9 @@ export default React.memo(function DashboardView({ memory, onBeginRitual, onDisc
       display: 'flex',
       position: 'relative',
       overflow: 'hidden',
-      backgroundColor: '#030507',
+      backgroundColor: 'transparent',
     }}>
-      <ParticleField />
       
-      {/* Scanline Overlay */}
-      <div style={{
-        position: 'fixed', inset: 0, zIndex: 1, pointerEvents: 'none',
-        background: 'linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06))',
-        backgroundSize: '100% 4px, 6px 100%',
-      }} />
-
       {/* Sidebar */}
       <motion.aside
         initial={{ x: -30, opacity: 0 }}
@@ -326,15 +318,20 @@ export default React.memo(function DashboardView({ memory, onBeginRitual, onDisc
                 transition={{ duration: 0.5 }}
               >
                 {/* Stats row */}
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-                  gap: '1px',
-                  border: '1px solid rgba(59,130,246,0.08)',
-                  borderRadius: '6px',
-                  overflow: 'hidden',
-                  marginBottom: '40px',
-                }}>
+                <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
+                  className="glass-card"
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+                    gap: '1px',
+                    overflow: 'hidden',
+                    marginBottom: '40px',
+                  }}
+                >
                   {[
                     { label: 'Days observed', value: days.toString() },
                     { label: 'Telemetry Acquired', value: `${calibrationPercent}%` },
@@ -343,7 +340,6 @@ export default React.memo(function DashboardView({ memory, onBeginRitual, onDisc
                   ].map((stat, i) => (
                     <div key={i} style={{
                       padding: '28px 24px',
-                      background: 'rgba(6,10,15,0.6)',
                       borderRight: i < 3 ? '1px solid rgba(59,130,246,0.08)' : 'none',
                     }}>
                       <p style={{
@@ -362,16 +358,21 @@ export default React.memo(function DashboardView({ memory, onBeginRitual, onDisc
                       </p>
                     </div>
                   ))}
-                </div>
+                </motion.div>
 
                 {/* Calibration progress bar (if not calibrated) */}
                 {!isCalibrated && (
-                  <div style={{
-                    border: '1px solid rgba(59,130,246,0.08)',
-                    borderRadius: '6px', padding: '24px 28px',
-                    background: 'rgba(6,10,15,0.6)',
-                    marginBottom: '40px'
-                  }}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.2 }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    className="glass-card"
+                    style={{
+                      padding: '24px 28px',
+                      marginBottom: '40px'
+                    }}
+                  >
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
                       <span style={{ fontSize: '11px', letterSpacing: '0.15em', color: 'var(--nx-text-dim)', textTransform: 'uppercase' }}>
                         Calibration Baseline Progress
@@ -392,16 +393,18 @@ export default React.memo(function DashboardView({ memory, onBeginRitual, onDisc
                     <p style={{ fontSize: '10px', color: 'var(--nx-text-muted)', marginTop: '8px' }}>
                       NX requires 8 complete telemetry logs to generate your clinical behavioral model.
                     </p>
-                  </div>
+                  </motion.div>
                 )}
 
                 {/* Last entry + Current state */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '40px' }}>
-                  <div style={{
-                    border: '1px solid rgba(59,130,246,0.08)',
-                    borderRadius: '6px', padding: '28px',
-                    background: 'rgba(6,10,15,0.6)',
-                  }}>
+                <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
+                  style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '40px' }}
+                >
+                  <div className="glass-card" style={{ padding: '28px' }}>
                     <p style={{
                       fontSize: '10px', letterSpacing: '0.15em',
                       color: 'var(--nx-text-muted)', textTransform: 'uppercase',
@@ -444,11 +447,7 @@ export default React.memo(function DashboardView({ memory, onBeginRitual, onDisc
                     )}
                   </div>
 
-                  <div style={{
-                    border: '1px solid rgba(59,130,246,0.08)',
-                    borderRadius: '6px', padding: '28px',
-                    background: 'rgba(6,10,15,0.6)',
-                  }}>
+                  <div className="glass-card" style={{ padding: '28px' }}>
                     <p style={{
                       fontSize: '10px', letterSpacing: '0.15em',
                       color: 'var(--nx-text-muted)', textTransform: 'uppercase',
@@ -477,14 +476,17 @@ export default React.memo(function DashboardView({ memory, onBeginRitual, onDisc
                       ))}
                     </div>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Trait bars */}
-                <div style={{
-                  border: '1px solid rgba(59,130,246,0.08)',
-                  borderRadius: '6px', padding: '28px',
-                  background: 'rgba(6,10,15,0.6)',
-                }}>
+                <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
+                  className="glass-card"
+                  style={{ padding: '28px' }}
+                >
                   <p style={{
                     fontSize: '10px', letterSpacing: '0.15em',
                     color: 'var(--nx-text-muted)', textTransform: 'uppercase',
@@ -543,7 +545,7 @@ export default React.memo(function DashboardView({ memory, onBeginRitual, onDisc
                       </div>
                     ))}
                   </div>
-                </div>
+                </motion.div>
               </motion.div>
             )}
 
@@ -575,14 +577,12 @@ export default React.memo(function DashboardView({ memory, onBeginRitual, onDisc
                       return (
                         <motion.div
                           key={session.id}
-                          initial={{ opacity: 0, y: 8 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: i * 0.05 }}
-                          style={{
-                            border: '1px solid rgba(59,130,246,0.08)',
-                            borderRadius: '6px', padding: '24px',
-                            background: 'rgba(6,10,15,0.6)',
-                          }}
+                          initial={{ opacity: 0, y: 50 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true, amount: 0.1 }}
+                          transition={{ duration: 0.6, ease: "easeOut", delay: i * 0.05 }}
+                          className="glass-card"
+                          style={{ padding: '24px' }}
                         >
                           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
                             <p style={{ fontFamily: 'Space Mono, monospace', fontSize: '11px', color: 'var(--nx-text-dim)' }}>
@@ -631,32 +631,35 @@ export default React.memo(function DashboardView({ memory, onBeginRitual, onDisc
                 }}>Behavioral Memory Wall</h2>
 
                 {behavioralPatterns.length === 0 ? (
-                  <div style={{
-                    border: '1px solid rgba(59,130,246,0.08)',
-                    borderRadius: '6px', padding: '40px',
-                    background: 'rgba(6,10,15,0.6)', textAlign: 'center',
-                  }}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.2 }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    className="glass-card"
+                    style={{ padding: '40px', textAlign: 'center' }}
+                  >
                     <p style={{ color: 'var(--nx-text-muted)', fontSize: '13px', fontStyle: 'italic' }}>
                       Insufficient data.<br />
                       <span style={{ fontSize: '11px', marginTop: '8px', display: 'block' }}>
                         Patterns emerge and activate dynamically after multiple sessions.
                       </span>
                     </p>
-                  </div>
+                    </motion.div>
                 ) : (
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
                     {behavioralPatterns.map((pattern, i) => (
                       <motion.div
                         key={i}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.08 }}
+                        initial={{ opacity: 0, x: -30 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true, amount: 0.1 }}
+                        transition={{ duration: 0.6, ease: "easeOut", delay: i * 0.08 }}
+                        className="glass-card"
                         style={{
                           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                           padding: '20px 24px',
-                          border: `1px solid ${pattern.status === 'active' ? 'rgba(59,130,246,0.18)' : 'rgba(59,130,246,0.08)'}`,
-                          borderRadius: '6px',
-                          background: pattern.status === 'active' ? 'rgba(59,130,246,0.02)' : 'rgba(6,10,15,0.6)',
+                          border: pattern.status === 'active' ? '1px solid rgba(6, 182, 212, 0.4)' : undefined,
                         }}
                       >
                         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
@@ -703,30 +706,35 @@ export default React.memo(function DashboardView({ memory, onBeginRitual, onDisc
                 }}>Discrepancy Log</h2>
 
                 {discrepancyLog.length === 0 ? (
-                  <div style={{
-                    border: '1px solid rgba(59,130,246,0.08)',
-                    borderRadius: '6px', padding: '40px',
-                    background: 'rgba(6,10,15,0.6)', textAlign: 'center',
-                  }}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.2 }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    className="glass-card"
+                    style={{ padding: '40px', textAlign: 'center' }}
+                  >
                     <p style={{ color: 'var(--nx-text-muted)', fontSize: '13px', fontStyle: 'italic' }}>
                       No contradictions logged.<br />
                       <span style={{ fontSize: '11px', marginTop: '8px', display: 'block' }}>
                         NX logs inconsistencies between your claims and your actions.
                       </span>
                     </p>
-                  </div>
+                    </motion.div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     {discrepancyLog.map((item, i) => (
                       <motion.div
                         key={i}
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.05 }}
+                        initial={{ opacity: 0, y: 50 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.1 }}
+                        transition={{ duration: 0.6, ease: "easeOut", delay: i * 0.05 }}
+                        className="glass-card"
                         style={{
+                          padding: '24px',
                           border: '1px solid rgba(239, 68, 68, 0.15)',
-                          borderRadius: '6px', padding: '24px',
-                          background: 'rgba(239, 68, 68, 0.01)',
+                          background: 'rgba(239, 68, 68, 0.05)',
                         }}
                       >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -778,11 +786,14 @@ export default React.memo(function DashboardView({ memory, onBeginRitual, onDisc
                   textTransform: 'uppercase', marginBottom: '32px',
                 }}>System insights</h2>
 
-                <div style={{
-                  border: '1px solid rgba(59,130,246,0.08)',
-                  borderRadius: '6px', padding: '40px',
-                  background: 'rgba(6,10,15,0.6)',
-                }}>
+                <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
+                  className="glass-card"
+                  style={{ padding: '40px' }}
+                >
                   {!isCalibrated ? (
                     <p style={{ color: 'var(--nx-text-muted)', fontSize: '13px', lineHeight: 1.8, fontStyle: 'italic' }}>
                       NX baseline calibration in progress.<br />
@@ -820,39 +831,57 @@ export default React.memo(function DashboardView({ memory, onBeginRitual, onDisc
                         </div>
                       )}
 
-                      {/* Primary Diagnostic Summary */}
-                      <div>
-                        <p style={{
-                          fontFamily: 'Space Mono, monospace', fontSize: '11px',
-                          color: 'var(--nx-blue-bright)', textTransform: 'uppercase',
-                          letterSpacing: '0.15em', marginBottom: '12px'
-                        }}>
-                          Behavioral Diagnosis
-                        </p>
-                        <p style={{ fontSize: '15px', fontWeight: 300, color: 'var(--nx-text)', lineHeight: 1.7 }}>
-                          Based on 8 complete telemetry logs, your dominant behavioral profile is characterized by high {traitEntries.sort((a, b) => b.value - a.value)[0].key.toLowerCase()} responses.
-                          Observations show persistent choices reflecting this pattern across both professional and personal environments.
-                        </p>
-                      </div>
+                      {memory.finalDiagnosis ? (
+                        <div>
+                          <p style={{
+                            fontFamily: 'Space Mono, monospace', fontSize: '11px',
+                            color: '#ff2a2a', textTransform: 'uppercase',
+                            letterSpacing: '0.15em', marginBottom: '12px',
+                            textShadow: '0 0 8px rgba(255, 42, 42, 0.4)'
+                          }}>
+                            Final Prophetic Diagnosis
+                          </p>
+                          <p style={{ fontSize: '15px', fontWeight: 300, color: 'var(--nx-text)', lineHeight: 1.8, fontStyle: 'italic', letterSpacing: '0.02em' }}>
+                            {memory.finalDiagnosis}
+                          </p>
+                        </div>
+                      ) : (
+                        <>
+                          {/* Primary Diagnostic Summary */}
+                          <div>
+                            <p style={{
+                              fontFamily: 'Space Mono, monospace', fontSize: '11px',
+                              color: 'var(--nx-blue-bright)', textTransform: 'uppercase',
+                              letterSpacing: '0.15em', marginBottom: '12px'
+                            }}>
+                              Behavioral Diagnosis
+                            </p>
+                            <p style={{ fontSize: '15px', fontWeight: 300, color: 'var(--nx-text)', lineHeight: 1.7 }}>
+                              Based on {memory.sessionCount} complete telemetry logs, your dominant behavioral profile is characterized by high {traitEntries.sort((a, b) => b.value - a.value)[0].key.toLowerCase()} responses.
+                              Observations show persistent choices reflecting this pattern across both professional and personal environments.
+                            </p>
+                          </div>
 
-                      {/* Clinical Reflection */}
-                      <div>
-                        <p style={{
-                          fontFamily: 'Space Mono, monospace', fontSize: '11px',
-                          color: 'var(--nx-blue-bright)', textTransform: 'uppercase',
-                          letterSpacing: '0.15em', marginBottom: '12px'
-                        }}>
-                          Observer Reflection
-                        </p>
-                        <p style={{ fontSize: '14px', fontWeight: 300, color: 'var(--nx-text-dim)', lineHeight: 1.7 }}>
-                          You have engaged {memory.sessionCount} times.
-                          The contradiction logs indicate gaps in consistency between stated goals and concrete actions.
-                          No encouragement is offered. The observed telemetry suggests you continue logs to monitor if these patterns resolve or entrench.
-                        </p>
-                      </div>
+                          {/* Clinical Reflection */}
+                          <div>
+                            <p style={{
+                              fontFamily: 'Space Mono, monospace', fontSize: '11px',
+                              color: 'var(--nx-blue-bright)', textTransform: 'uppercase',
+                              letterSpacing: '0.15em', marginBottom: '12px'
+                            }}>
+                              Observer Reflection
+                            </p>
+                            <p style={{ fontSize: '14px', fontWeight: 300, color: 'var(--nx-text-dim)', lineHeight: 1.7 }}>
+                              You have engaged {memory.sessionCount} times.
+                              The contradiction logs indicate gaps in consistency between stated goals and concrete actions.
+                              No encouragement is offered. The observed telemetry suggests you continue logs to monitor if these patterns resolve or entrench.
+                            </p>
+                          </div>
+                        </>
+                      )}
                     </div>
                   )}
-                </div>
+                </motion.div>
               </motion.div>
             )}
           </AnimatePresence>
