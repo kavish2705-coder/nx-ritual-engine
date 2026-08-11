@@ -1,10 +1,6 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI;
-
-if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
-}
+// We check MONGODB_URI inside connectToDatabase to avoid build-time errors
 
 interface GlobalMongoose {
   conn: typeof mongoose | null;
@@ -19,6 +15,11 @@ declare global {
 let cached = global.mongoose;
 
 export async function connectToDatabase() {
+  const MONGODB_URI = process.env.MONGODB_URI;
+  if (!MONGODB_URI) {
+    throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
+  }
+
   if (!cached) {
     cached = { conn: null, promise: null };
     global.mongoose = cached;
