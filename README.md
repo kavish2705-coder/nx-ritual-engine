@@ -1,5 +1,7 @@
 # NX // Ritual Calibration Engine
 
+**🔴 Live Project:** [https://nx-ritual-engine.vercel.app](https://nx-ritual-engine.vercel.app)
+
 `NX` is a cold, clinical, and unsettling behavioral observation interface designed to observe, log, and analyze user cognitive patterns. Through a structured 8-session calibration ritual, it tracks and maps behavioral traits, exposes contradictions between claims and actions, and compiles an uncompromising profile of the subject's decision-making mechanics.
 
 ---
