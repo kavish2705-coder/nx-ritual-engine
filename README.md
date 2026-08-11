@@ -8,14 +8,14 @@
 
 ## Core Features
 
-- **Automated Behavioral Telemetry**: An interactive terminal driven by Gemini models. It operates with a dry, mechanical, logging-style persona that rejects conversational padding in favor of diagnostic queries.
+- **Automated Behavioral Telemetry**: An interactive terminal driven by NVIDIA NIM models (Nemotron-3). It operates with a dry, mechanical, logging-style persona that rejects conversational padding in favor of diagnostic queries.
 - **Centralized User Memory**: Direct integration with a MongoDB cloud database via Mongoose, tracking session history, known facts, behavioral patterns, and moving averages of core traits.
 - **Real-Time Trait Calibration**: Dynamic moving average algorithms that score and calibrate four distinct behavioral vectors:
   - **Avoidance**: Postponing critical interactions or choosing immediate comfort.
   - **Overthinking**: Circular reasoning and excessive analysis causing operational delay.
   - **Inconsistency**: Discrepancies between stated values/claims and actual observed behaviors.
   - **Stress Response**: Friction and pressure tolerance levels.
-- **Cascade Fallback Chain**: Robust API integration designed to prioritize Gemini Pro models (`gemini-2.5-pro`, `gemini-pro-latest`) and seamlessly cascade through Standard and Lightweight Flash models (`gemini-3.1-flash-lite`, `gemini-2.5-flash-lite`) if developer API quotas are exhausted.
+- **High-Performance Inference**: Robust API integration powered by the NVIDIA NIM API for low-latency, specialized behavioral analysis.
 - **Atmospheric Visuals**: A premium dark-mode interface featuring particle fog, SVG/Canvas candle animations that pulse into a warning crimson red during unstable states, and a staggered typewriter glitch sequence announcing the conclusion of the ritual.
 
 ---
@@ -74,7 +74,7 @@ NX's system prompt sets the following boundaries for the observer persona:
 - **Framework**: Next.js 16 (App Router, Turbopack, TypeScript)
 - **Database**: MongoDB (Atlas) & Mongoose ODM
 - **Animation**: Framer Motion & HTML Canvas
-- **AI Integration**: `@google/generative-ai` (Google AI Studio SDK)
+- **AI Integration**: NVIDIA NIM API (`nvidia/nemotron-3-ultra-550b-a55b`) using native Fetch.
 
 ---
 
@@ -86,11 +86,8 @@ To run the application, configure a `.env.local` file in the project root contai
 # MongoDB Cloud Connection
 MONGODB_URI=mongodb+srv://...
 
-# Google AI Studio API Key
-GEMINI_API_KEY=AIzaSy...
-
-# (Optional) Force the app to try a specific model first
-GEMINI_MODEL=gemini-2.5-pro
+# NVIDIA NIM API Key
+NVIDIA_API_KEY=nvapi-...
 ```
 
 ---
