@@ -179,7 +179,7 @@ export default function Home() {
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                 <span className="facility-label" style={{ color: 'rgba(6, 182, 212, 0.8)' }}>
-                  STATUS: {memory ? `OBSERVATION LOG ${memory.sessionCount}/8` : 'DORMANT · CALIBRATION REQUIRED'}
+                  {memory ? `THE RITE · ${memory.sessionCount}/8` : 'DORMANT · CALIBRATION REQUIRED'}
                 </span>
                 {memory && (
                   <button
@@ -212,7 +212,7 @@ export default function Home() {
               <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', gap: '20px' }}>
                 <div>
                   <span className="facility-label" style={{ display: 'block', marginBottom: '12px' }}>
-                    FACILITY LOG | TERMINAL 01
+                    THE FIRST RITE
                   </span>
                   <h1 className="ritual-glow" style={{
                     fontFamily: 'Space Grotesk, sans-serif',
@@ -240,10 +240,10 @@ export default function Home() {
                 {/* Asymmetric Right-Aligned Status */}
                 <div style={{ maxWidth: '240px', textAlign: 'right', marginTop: '30px' }}>
                   <p className="facility-label" style={{ color: 'var(--nx-text-muted)', lineHeight: 1.8 }}>
-                    No behavioral profile exists.
+                    THE RECORD IS EMPTY.
                   </p>
                   <p className="facility-label" style={{ color: 'rgba(6, 182, 212, 0.5)', marginTop: '8px' }}>
-                    Awaiting subject ignition.
+                    THE FLAME WAITS.
                   </p>
                 </div>
               </div>
@@ -281,8 +281,8 @@ export default function Home() {
               transition={{ duration: 0.8, ease: "easeOut" }}
               className="glass-panel" style={{ padding: '40px', marginBottom: '40px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '24px' }}>
-                <span className="facility-label">01 OBSERVATION</span>
-                <span className="facility-label">SYS STATUS: IDLE</span>
+                <span className="facility-label">01  THE WATCH</span>
+                <span className="facility-label">STATE: SILENT</span>
               </div>
               <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 'clamp(22px, 3.5vw, 32px)', fontWeight: 300, color: 'var(--nx-text)', letterSpacing: '0.04em', margin: 0 }}>
                 Patterns survive. Memories don't.
@@ -297,8 +297,8 @@ export default function Home() {
               transition={{ duration: 0.8, ease: "easeOut" }}
               className="glass-panel" style={{ padding: '40px', marginBottom: '40px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '24px' }}>
-                <span className="facility-label">02 CALIBRATION PROTOCOL</span>
-                <span className="facility-label">SEQUENCE 0/8</span>
+                <span className="facility-label">02  THE RITE</span>
+                <span className="facility-label">PASSAGE {memory?.sessionCount || 0}/8</span>
               </div>
               <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 'clamp(22px, 3.5vw, 32px)', fontWeight: 300, color: 'var(--nx-text)', letterSpacing: '0.04em', marginBottom: '40px' }}>
                 Eight observations. Nothing more.
@@ -316,7 +316,7 @@ export default function Home() {
                       {num}
                     </span>
                     <span style={{ display: 'block', fontFamily: 'Space Mono, monospace', fontSize: '8px', color: 'var(--nx-text-muted)', marginTop: '4px' }}>
-                      {i < (memory?.sessionCount || 0) ? 'LOGGED' : 'PENDING'}
+                      {i < (memory?.sessionCount || 0) ? 'COMPLETE' : 'UNLIT'}
                     </span>
                   </div>
                 ))}
@@ -332,11 +332,11 @@ export default function Home() {
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
               className="glass-panel" style={{ padding: '60px 40px', textAlign: 'center' }}>
-              <span className="facility-label" style={{ display: 'block', marginBottom: '16px' }}>
-                TERMINAL IDLE | AWAITING SUBJECT ENTRY
+              <span className="facility-label" style={{ display: 'block', marginBottom: '16px', lineHeight: '1.6' }}>
+                THE CHAMBER IS SILENT.<br />AWAITING ENTRY.
               </span>
               <p className="facility-label" style={{ color: 'var(--nx-text-dim)', marginBottom: '40px' }}>
-                Calibration required to construct subject memory profile.
+                The rite has not begun.
               </p>
 
               <motion.button
@@ -357,13 +357,13 @@ export default function Home() {
                   cursor: 'pointer',
                 }}
               >
-                INITIATE CALIBRATION
+                BEGIN THE RITE
               </motion.button>
             </motion.section>
 
             {/* Facility System Footer */}
             <footer style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '40px', marginTop: '60px', borderTop: '1px solid rgba(8, 145, 178, 0.15)' }}>
-              <span className="facility-label">OBSERVATORY FACILITY SYSTEM ONLINE</span>
+              <span className="facility-label">THE OBSERVATORY IS AWAKE</span>
               <div style={{ display: 'flex', gap: '20px' }}>
                 <span className="facility-label">ENCRYPTED</span>
                 <span className="facility-label">RESTRICTED</span>
