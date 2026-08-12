@@ -172,9 +172,9 @@ export default function Home() {
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '13px', letterSpacing: '0.3em', fontWeight: 'bold', color: 'var(--nx-text)' }}>
-                  THE
+                  N X
                 </span>
-                <span className="facility-label">RITUAL</span>
+                <span className="facility-label">THE RITUAL</span>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -223,7 +223,7 @@ export default function Home() {
                     color: '#ffffff',
                     margin: 0,
                   }}>
-                    THE
+                    N X
                   </h1>
                   <h2 style={{
                     fontFamily: 'Space Mono, monospace',
@@ -233,7 +233,7 @@ export default function Home() {
                     color: 'rgba(6, 182, 212, 0.7)',
                     marginTop: '8px',
                   }}>
-                    RITUAL
+                    THE RITUAL
                   </h2>
                 </div>
 
