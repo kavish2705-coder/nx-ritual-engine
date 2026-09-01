@@ -52,11 +52,15 @@ export default function BackgroundMusic() {
       document.removeEventListener('click', handleInteraction);
       document.removeEventListener('keydown', handleInteraction);
       document.removeEventListener('scroll', handleInteraction);
+      document.removeEventListener('touchstart', handleInteraction);
+      document.removeEventListener('touchend', handleInteraction);
     };
 
     document.addEventListener('click', handleInteraction);
     document.addEventListener('keydown', handleInteraction);
     document.addEventListener('scroll', handleInteraction);
+    document.addEventListener('touchstart', handleInteraction, { passive: true });
+    document.addEventListener('touchend', handleInteraction, { passive: true });
 
     return cleanup;
   }, []); // Run only once
@@ -81,9 +85,14 @@ export default function BackgroundMusic() {
     }
   };
 
+  const lastSaveRef = useRef(0);
   const handleTimeUpdate = () => {
     if (audioRef.current) {
-      sessionStorage.setItem('bgMusicTime', audioRef.current.currentTime.toString());
+      const now = Date.now();
+      if (now - lastSaveRef.current > 1000) {
+        sessionStorage.setItem('bgMusicTime', audioRef.current.currentTime.toString());
+        lastSaveRef.current = now;
+      }
     }
   };
 

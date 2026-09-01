@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import GasFlame from './GasFlame';
+import Image from 'next/image';
 
 export type CandleState = 'idle' | 'ignition' | 'active' | 'unstable' | 'extinguished';
 
@@ -110,7 +111,7 @@ export default function AnimeCandle({ state: externalState, onClick, className =
   };
 
   return (
-    <div className={`relative flex flex-col items-center justify-end w-64 h-[440px] ${className}`}>
+    <div className={`relative flex flex-col items-center justify-end w-64 h-[440px] scale-75 sm:scale-90 md:scale-100 origin-bottom ${className}`}>
 
       <div
         className="relative flex flex-col items-center justify-end h-full w-full cursor-pointer"
@@ -152,10 +153,12 @@ export default function AnimeCandle({ state: externalState, onClick, className =
         {/* === BASE (Ritual Torch) === */}
         {!hideBase && (
           <div className="relative w-36 h-[340px] z-20 pointer-events-none flex-shrink-0">
-            <img
+            <Image
               src="/ritual-torch.png"
               alt="Ritual Torch"
-              className="w-full h-full object-contain select-none pointer-events-none"
+              fill
+              priority
+              className="object-contain select-none pointer-events-none"
               style={{
                 // In unstable state, the metal glows crimson-red
                 filter: state === 'unstable'

@@ -108,31 +108,23 @@ export default React.memo(function DashboardView({ memory, onBeginRitual, onDisc
   ];
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      position: 'relative',
-      overflow: 'hidden',
-      backgroundColor: 'transparent',
-    }}>
+    <div className="flex flex-col md:flex-row min-h-screen relative overflow-hidden bg-transparent">
       
       {/* Sidebar */}
       <motion.aside
         initial={{ x: -30, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.8 }}
+        className="w-full md:w-[220px] shrink-0 flex flex-col z-20 border-b md:border-b-0 md:border-r border-blue-500/10 p-4 md:px-4 md:py-8"
         style={{
-          width: '220px', flexShrink: 0,
-          borderRight: '1px solid rgba(59,130,246,0.08)',
-          display: 'flex', flexDirection: 'column',
-          padding: '32px 16px',
-          zIndex: 2,
           backdropFilter: 'blur(10px)',
           background: 'rgba(6, 10, 15, 0.4)',
         }}
       >
-        {/* Logo */}
-        <div style={{ marginBottom: '40px', padding: '0 4px' }}>
+        {/* Top row on mobile, column on desktop */}
+        <div className="flex flex-row md:flex-col justify-between items-center md:items-start w-full">
+          {/* Logo */}
+          <div className="mb-0 md:mb-10 px-1 shrink-0">
           <span style={{
             fontFamily: 'Space Mono, monospace',
             fontSize: '13px', letterSpacing: '0.3em',
@@ -141,19 +133,21 @@ export default React.memo(function DashboardView({ memory, onBeginRitual, onDisc
         </div>
 
         {/* Nav */}
-        <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        <nav className="flex flex-row md:flex-col gap-2 md:gap-1 flex-1 overflow-x-auto md:overflow-visible ml-4 md:ml-0 w-full no-scrollbar">
           {navItems.map(item => (
             <button
               key={item.id}
               onClick={() => setActiveNav(item.id)}
-              className={`nx-nav-item ${activeNav === item.id ? 'active' : ''}`}
-              style={{ border: 'none', width: '100%', textAlign: 'left' }}
+              className={`nx-nav-item whitespace-nowrap ${activeNav === item.id ? 'active' : ''}`}
+              style={{ border: 'none', textAlign: 'left' }}
             >
               <span>{item.label}</span>
             </button>
           ))}
         </nav>
+        </div>
 
+        <div className="hidden md:flex flex-col flex-1 justify-end">
         {/* Candle state indicator */}
         <div style={{
           padding: '16px 4px',
@@ -253,21 +247,17 @@ export default React.memo(function DashboardView({ memory, onBeginRitual, onDisc
             · Terminate profile
           </button>
         )}
+        </div>
       </motion.aside>
 
       {/* Main content */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', zIndex: 2, overflowY: 'auto' }}>
+      <div className="flex-1 flex flex-col z-[2] overflow-y-auto">
         {/* Top bar */}
         <motion.header
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
-          style={{
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            padding: '24px 40px',
-            borderBottom: '1px solid rgba(59,130,246,0.06)',
-            background: 'rgba(6, 10, 15, 0.2)',
-          }}
+          className="flex justify-between items-center px-4 py-6 md:px-10 md:py-6 border-b border-blue-500/10 bg-[#060a0f]/20"
         >
           <div>
             <p style={{ fontSize: '12px', color: 'var(--nx-text-muted)', letterSpacing: '0.05em', marginBottom: '2px' }}>
@@ -307,7 +297,7 @@ export default React.memo(function DashboardView({ memory, onBeginRitual, onDisc
         </motion.header>
 
         {/* Content area */}
-        <div style={{ flex: 1, padding: '40px' }}>
+        <div className="flex-1 p-4 md:p-10">
           <AnimatePresence mode="wait">
             {activeNav === 'overview' && (
               <motion.div
@@ -323,14 +313,7 @@ export default React.memo(function DashboardView({ memory, onBeginRitual, onDisc
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.2 }}
                   transition={{ duration: 0.8, ease: "easeOut" }}
-                  className="glass-card"
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-                    gap: '1px',
-                    overflow: 'hidden',
-                    marginBottom: '40px',
-                  }}
+                  className="glass-card grid grid-cols-2 md:grid-cols-4 gap-[1px] overflow-hidden mb-8 md:mb-10"
                 >
                   {[
                     { label: 'Days observed', value: days.toString() },
@@ -402,7 +385,7 @@ export default React.memo(function DashboardView({ memory, onBeginRitual, onDisc
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.2 }}
                   transition={{ duration: 0.8, ease: "easeOut" }}
-                  style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '40px' }}
+                  className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 md:mb-10"
                 >
                   <div className="glass-card" style={{ padding: '28px' }}>
                     <p style={{
