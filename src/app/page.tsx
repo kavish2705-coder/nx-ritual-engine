@@ -147,14 +147,7 @@ export default function Home() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, scale: 0.98 }}
             transition={{ duration: 1.2 }}
-            style={{
-              position: 'relative', zIndex: 2,
-              display: 'flex', flexDirection: 'column',
-              minHeight: '100vh',
-              padding: '0 24px 120px',
-              maxWidth: '900px',
-              margin: '0 auto',
-            }}
+            className="relative z-[2] flex flex-col min-h-screen px-4 pb-16 md:px-6 md:pb-[120px] max-w-[900px] mx-auto"
           >
             <div className="scanline-facility" />
             {/* Facility Header */}
@@ -162,13 +155,7 @@ export default function Home() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="glass-panel"
-              style={{
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                padding: '16px 24px', 
-                marginBottom: '80px',
-                position: 'sticky', top: '24px', zIndex: 10,
-              }}
+              className="glass-panel flex justify-between items-center px-4 py-4 md:px-6 mb-12 md:mb-[80px] sticky top-4 md:top-6 z-10"
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '13px', letterSpacing: '0.3em', fontWeight: 'bold', color: 'var(--nx-text)' }}>
@@ -203,13 +190,10 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              style={{
-              display: 'flex', flexDirection: 'column',
-              minHeight: '65vh', justifyContent: 'center',
-              position: 'relative', marginBottom: '100px',
-            }}>
+              className="flex flex-col min-h-[65vh] justify-center relative mb-16 md:mb-[100px]"
+            >
               {/* Asymmetric Title Block */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', gap: '20px' }}>
+              <div className="flex flex-col md:flex-row md:flex-wrap justify-between items-start gap-5">
                 <div>
                   <span className="facility-label" style={{ display: 'block', marginBottom: '12px' }}>
                     THE FIRST RITE
@@ -238,7 +222,7 @@ export default function Home() {
                 </div>
 
                 {/* Asymmetric Right-Aligned Status */}
-                <div style={{ maxWidth: '240px', textAlign: 'right', marginTop: '30px' }}>
+                <div className="w-full md:max-w-[240px] text-left md:text-right mt-6 md:mt-[30px]">
                   <p className="facility-label" style={{ color: 'var(--nx-text-muted)', lineHeight: 1.8 }}>
                     THE RECORD IS EMPTY.
                   </p>
@@ -279,7 +263,8 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className="glass-panel" style={{ padding: '40px', marginBottom: '40px' }}>
+              className="glass-panel p-6 md:p-10 mb-8 md:mb-10"
+            >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '24px' }}>
                 <span className="facility-label">01  THE WATCH</span>
                 <span className="facility-label">STATE: SILENT</span>
@@ -295,7 +280,8 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className="glass-panel" style={{ padding: '40px', marginBottom: '40px' }}>
+              className="glass-panel p-6 md:p-10 mb-8 md:mb-10"
+            >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '24px' }}>
                 <span className="facility-label">02  THE RITE</span>
                 <span className="facility-label">PASSAGE {memory?.sessionCount || 0}/8</span>
@@ -305,7 +291,7 @@ export default function Home() {
               </p>
 
               {/* Roman Numeral Sequence Track */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: '12px', textAlign: 'center' }}>
+              <div className="grid grid-cols-4 md:grid-cols-8 gap-3 text-center">
                 {['Ⅰ', 'Ⅱ', 'Ⅲ', 'Ⅳ', 'Ⅴ', 'Ⅵ', 'Ⅶ', 'Ⅷ'].map((num, i) => (
                   <div key={num} className="glass-card" style={{
                     padding: '16px 4px',
@@ -331,7 +317,8 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className="glass-panel" style={{ padding: '60px 40px', textAlign: 'center' }}>
+              className="glass-panel px-6 py-10 md:px-10 md:py-[60px] text-center"
+            >
               <span className="facility-label" style={{ display: 'block', marginBottom: '16px', lineHeight: '1.6' }}>
                 THE CHAMBER IS SILENT.<br />AWAITING ENTRY.
               </span>

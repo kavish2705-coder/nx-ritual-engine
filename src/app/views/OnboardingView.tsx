@@ -123,17 +123,9 @@ export default function OnboardingView({ onComplete }: Props) {
 
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex', flexDirection: 'column',
-      alignItems: 'center', justifyContent: 'center',
-      padding: '40px 20px',
-    }}>
+    <div className="flex flex-col min-h-screen items-center justify-center p-4 md:py-10 md:px-5 relative">
       {/* Step indicators */}
-      <div style={{
-        position: 'absolute', top: 40,
-        display: 'flex', gap: 8,
-      }}>
+      <div className="absolute top-8 md:top-10 flex gap-2">
         {steps.map((_, i) => (
           <div key={i} style={{
             width: i === step ? 20 : 6,
@@ -152,7 +144,7 @@ export default function OnboardingView({ onComplete }: Props) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.6 }}
-          style={{ width: '100%', maxWidth: '500px' }}
+          className="w-full max-w-[500px] px-4"
         >
           {steps[step]?.content}
         </motion.div>

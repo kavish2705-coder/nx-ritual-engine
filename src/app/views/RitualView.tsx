@@ -653,14 +653,7 @@ export default function RitualView({ memory, onEnd }: Props) {
       }} />
 
       {/* Top bar */}
-      <div style={{
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        padding: '24px 40px',
-        borderBottom: '1px solid rgba(59,130,246,0.06)',
-        position: 'relative',
-        zIndex: 10,
-        backdropFilter: 'blur(5px)'
-      }}>
+      <div className="flex flex-wrap gap-4 justify-between items-center px-4 py-4 md:px-10 md:py-6 border-b border-blue-500/10 relative z-10" style={{ backdropFilter: 'blur(5px)' }}>
         <span style={{
           fontFamily: 'Space Mono, monospace',
           fontSize: '11px', letterSpacing: '0.3em',
@@ -702,17 +695,7 @@ export default function RitualView({ memory, onEnd }: Props) {
       </div>
 
       {/* Main area */}
-      <div style={{
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        maxWidth: '680px',
-        width: '100%',
-        margin: '0 auto',
-        padding: '40px 24px',
-        position: 'relative',
-        zIndex: 2,
-      }}>
+      <div className="flex-1 flex flex-col w-full max-w-[680px] mx-auto px-4 py-6 md:px-6 md:py-10 relative z-[2]">
         {/* Messages */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '32px' }}>
           <AnimatePresence>
